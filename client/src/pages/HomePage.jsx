@@ -8,6 +8,7 @@ import aboutBg from '../assets/images/about-bg.png'
 import paBg from '../assets/images/pa.png'
 import iBg from '../assets/images/i.png'
 import haBg from '../assets/images/ha.jpg'
+import twBg from '../assets/images/tw.png'
 import './HomePage.css'
 
 const HomePage = () => {
@@ -107,6 +108,28 @@ const HomePage = () => {
           </div>
           <Link to="/high-school-athletes" className="ha-shop-now-right">
             Shop Now
+          </Link>
+        </div>
+      </div>
+      
+      {/* Teamwear Background Section */}
+      <div 
+        className="tw-background-section"
+        style={{ backgroundImage: `url(${twBg})` }}
+      >
+        <div className="tw-content-wrapper">
+          <div className="tw-text-content">
+            <Link 
+              to="/teamwear" 
+              id="teamwear" 
+              className="tw-category-link"
+            >
+              <h2 className="tw-category-title">TEAMWEAR</h2>
+              <p className="tw-category-description">Design custom uniforms for your squad and submit your teamwear request</p>
+            </Link>
+          </div>
+          <Link to="/teamwear" className="tw-shop-now-right">
+            Start Your Order
           </Link>
         </div>
       </div>
