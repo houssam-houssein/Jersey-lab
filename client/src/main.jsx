@@ -6,16 +6,35 @@ import './index.css'
 // Fix for GitHub Pages single-page app routing
 // This code handles the query string routing that GitHub Pages uses
 (function(l) {
-  if (l.search[1] === '/' ) {
+  // Only process if we have the query string format (/?/path)
+  if (l.search && l.search.length > 1 && l.search[1] === '/') {
     var decoded = l.search.slice(1).split('&').map(function(s) { 
       return s.replace(/~and~/g, '&')
     }).join('?');
-    // Preserve the base path (e.g., /NBA/)
-    var basePath = l.pathname.match(/^\/[^\/]+\//) || '/'
+    
+    // Detect base path - check for NBA-store first
+    var basePath = '/NBA-store/'
+    if (l.pathname.startsWith('/NBA-store/')) {
+      basePath = '/NBA-store/'
+    } else if (l.pathname.startsWith('/NBA/')) {
+      basePath = '/NBA/'
+    } else {
+      // Try to extract from pathname
+      var match = l.pathname.match(/^(\/[^\/]+\/)/)
+      basePath = match ? match[1] : '/'
+    }
+    
+    // Clean the decoded path
     var cleanPath = decoded.replace(/^\//, '')
-    window.history.replaceState(null, null,
-        basePath + cleanPath + l.hash
-    );
+    
+    // Only replace if we have a valid path to avoid loops
+    if (cleanPath && cleanPath !== '') {
+      var newPath = basePath + cleanPath + l.hash
+      // Prevent infinite loop: only replace if different
+      if (l.pathname + l.hash !== newPath) {
+        window.history.replaceState(null, null, newPath)
+      }
+    }
   }
 }(window.location))
 

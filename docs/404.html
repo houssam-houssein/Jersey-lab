@@ -23,6 +23,22 @@
       var pathSegmentsToKeep = 1;
 
       var l = window.location;
+      
+      // Prevent infinite loop: if we're already in query string format, don't redirect again
+      if (l.search[1] === '/') {
+        return;
+      }
+      
+      // Only redirect if we're not already at the index
+      var path = l.pathname.split('/').filter(function(segment) {
+        return segment !== '';
+      });
+      
+      // If we're at the root or already have the query format, don't redirect
+      if (path.length <= pathSegmentsToKeep && !l.search) {
+        return;
+      }
+      
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
         l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
