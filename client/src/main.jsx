@@ -13,10 +13,12 @@ try {
         return s.replace(/~and~/g, '&')
       }).join('?');
       
-      // Detect base path - check for jersey-lab first
-      var basePath = '/jersey-lab/'
-      if (l.pathname.startsWith('/jersey-lab/')) {
-        basePath = '/jersey-lab/'
+      // Detect base path - check for Jersey-lab (case-sensitive) first
+      var basePath = '/Jersey-lab/'
+      if (l.pathname.startsWith('/Jersey-lab/')) {
+        basePath = '/Jersey-lab/'
+      } else if (l.pathname.startsWith('/jersey-lab/')) {
+        basePath = '/jersey-lab/' // Backward compatibility (lowercase)
       } else if (l.pathname.startsWith('/NBA-store/')) {
         basePath = '/NBA-store/' // Backward compatibility
       } else if (l.pathname.startsWith('/NBA/')) {

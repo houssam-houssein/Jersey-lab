@@ -42,12 +42,16 @@ function getBasename() {
     const isGitHubPages = hostname.includes('github.io')
     
     // For GitHub Pages: /repo-name/ -> /repo-name
-    // Check for jersey-lab specifically first
+    // Check for Jersey-lab (case-sensitive) first
+    if (path.startsWith('/Jersey-lab/') || path === '/Jersey-lab') {
+      return '/Jersey-lab'
+    }
+    
+    // Backward compatibility checks (lowercase)
     if (path.startsWith('/jersey-lab/') || path === '/jersey-lab') {
       return '/jersey-lab'
     }
     
-    // Backward compatibility checks
     if (path.startsWith('/NBA-store/') || path === '/NBA-store') {
       return '/NBA-store'
     }
