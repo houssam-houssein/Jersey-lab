@@ -1,5 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // Get the base path from environment variable
 // For localhost development, use '/' (no base path)
@@ -20,8 +26,6 @@ export default defineConfig(({ command, mode }) => {
       {
         name: 'copy-404',
         writeBundle() {
-          const fs = require('fs')
-          const path = require('path')
           const src404 = path.resolve(__dirname, '404.html')
           const outDir = process.env.BUILD_TO_DOCS ? '../docs' : 'dist'
           const dest404 = path.resolve(__dirname, outDir, '404.html')
@@ -41,7 +45,7 @@ export default defineConfig(({ command, mode }) => {
     build: {
       outDir: process.env.BUILD_TO_DOCS ? '../docs' : 'dist',
       assetsDir: 'assets',
-      emptyOutDir: true,
+      emptyOutDir: !process.env.BUILD_TO_DOCS, // Don't empty docs folder (keep .nojekyll and README)
       rollupOptions: {
         output: {
           assetFileNames: (assetInfo) => {
