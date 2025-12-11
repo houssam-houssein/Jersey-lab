@@ -333,8 +333,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: linear-gradient(160deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
-  border: 1px solid rgba(76, 175, 80, 0.4);
+  background: linear-gradient(160deg, rgba(191, 255, 0, 0.2), rgba(191, 255, 0, 0.1));
+  border: 1px solid rgba(191, 255, 0, 0.4);
   border-radius: 8px;
 }
 
@@ -342,7 +342,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #4ade80;
+  color: #bfff00;
 }
 
 .promo-code-info svg {
@@ -383,11 +383,11 @@
 }
 
 .discount-row {
-  color: #4ade80;
+  color: #bfff00;
 }
 
 .discount-value {
-  color: #4ade80;
+  color: #bfff00;
 }
 
 .total-row {
@@ -447,15 +447,15 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background: linear-gradient(160deg, rgba(76, 175, 80, 0.2), rgba(76, 175, 80, 0.1));
-  border: 1px solid rgba(76, 175, 80, 0.4);
+  background: linear-gradient(160deg, rgba(191, 255, 0, 0.2), rgba(191, 255, 0, 0.1));
+  border: 1px solid rgba(191, 255, 0, 0.4);
   border-radius: 12px;
   padding: 20px 24px;
   position: relative;
 }
 
 .success-message svg:first-of-type {
-  color: #4ade80;
+  color: #bfff00;
   flex-shrink: 0;
 }
 

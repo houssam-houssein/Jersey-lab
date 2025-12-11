@@ -33,7 +33,12 @@ const ProfessionalAthletesPage = () => {
         const category = await response.json()
         
         if (category && category.products) {
-          setProducts(category.products.filter(p => p != null))
+          // Filter to only show active and coming-soon products
+          setProducts(category.products.filter(p => {
+            if (!p || p == null) return false
+            const status = (p.status || '').toLowerCase()
+            return status === 'active' || status === 'coming-soon' || status === 'coming soon'
+          }))
         } else {
           setProducts([])
         }
@@ -145,7 +150,17 @@ const ProfessionalAthletesPage = () => {
               )}
               <div className="athlete-overlay">
                 <h2 className="athlete-name-overlay">{product.title || 'Untitled Product'}</h2>
-                <p className="athlete-price-overlay">{formatPrice(product.price)}</p>
+                <p className={`athlete-price-overlay ${(() => {
+                  const status = (product.status || '').toLowerCase()
+                  return status === 'coming-soon' || status === 'coming soon' ? 'coming-soon-text' : ''
+                })()}`}>
+                  {(() => {
+                    const status = (product.status || '').toLowerCase()
+                    return status === 'coming-soon' || status === 'coming soon'
+                      ? 'Coming Soon' 
+                      : formatPrice(product.price)
+                  })()}
+                </p>
               </div>
             </div>
           ))}

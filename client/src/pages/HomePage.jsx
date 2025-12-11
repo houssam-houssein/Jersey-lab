@@ -7,7 +7,7 @@ import logoPoster from '../assets/images/logo-poster.png'
 import aboutBg from '../assets/images/about-bg.png'
 import paBg from '../assets/images/pa.png'
 import iBg from '../assets/images/i.png'
-import haBg from '../assets/images/ha.jpg'
+import haBg from '../assets/images/ha.png'
 import twBg from '../assets/images/tw.png'
 import './HomePage.css'
 
@@ -46,91 +46,97 @@ const HomePage = () => {
         </div>
       </div>
       
-      {/* PA Background Section */}
-      <div 
-        className="pa-background-section"
-        style={{ backgroundImage: `url(${paBg})` }}
-      >
-        <div className="pa-content-wrapper">
-          <Link to="/professional-athletes" className="pa-shop-now-left">
-            Shop Now
-          </Link>
-          <div className="pa-text-content">
-            <Link 
-              to="/professional-athletes" 
-              id="professional-athletes" 
-              className="pa-category-link"
-            >
-              <h2 className="pa-category-title">PROFESSIONAL ATHLETES</h2>
-              <p className="pa-category-description">Browse your favorite overseas professional's international jersey</p>
-            </Link>
+      {/* PA and Influencers Grid Container */}
+      <div className="pa-influencers-grid">
+        {/* PA Background Section */}
+        <div 
+          className="pa-background-section"
+          style={{ backgroundImage: `url(${paBg})` }}
+        >
+          <div className="pa-content-wrapper">
+            <div className="pa-text-content">
+              <Link 
+                to="/professional-athletes" 
+                id="professional-athletes" 
+                className="pa-category-link"
+              >
+                <h2 className="pa-category-title">PROFESSIONAL ATHLETES</h2>
+                <p className="pa-category-description">Browse your favorite overseas professional's international jersey</p>
+                <Link to="/professional-athletes" className="pa-shop-now-button">
+                  SHOP NOW →
+                </Link>
+              </Link>
+            </div>
+          </div>
+        </div>
+        
+        {/* Influencers Background Section */}
+        <div 
+          className="influencers-background-section"
+          style={{ backgroundImage: `url(${iBg})` }}
+        >
+          <div className="influencers-content-wrapper">
+            <div className="influencers-text-content">
+              <Link 
+                to="/influencers" 
+                id="influencers" 
+                className="influencers-category-link"
+              >
+                <h2 className="influencers-category-title">INFLUENCERS</h2>
+                <p className="influencers-category-description">Browse your favorite influencers' gear</p>
+                <Link to="/influencers" className="influencers-shop-now-button">
+                  SHOP NOW →
+                </Link>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Influencers Background Section */}
-      <div 
-        className="influencers-background-section"
-        style={{ backgroundImage: `url(${iBg})` }}
-      >
-        <div className="influencers-content-wrapper">
-          <div className="influencers-text-content">
-            <Link 
-              to="/influencers" 
-              id="influencers" 
-              className="influencers-category-link"
-            >
-              <h2 className="influencers-category-title">INFLUENCERS</h2>
-              <p className="influencers-category-description">Browse your favorite influencers' gear</p>
-            </Link>
+      {/* High School Athletes and Teamwear Grid Container */}
+      <div className="ha-tw-grid">
+        {/* High School Athletes Background Section */}
+        <div 
+          className="ha-background-section"
+          style={{ backgroundImage: `url(${haBg})` }}
+        >
+          <div className="ha-content-wrapper">
+            <div className="ha-text-content">
+              <Link 
+                to="/high-school-athletes" 
+                id="high-school-athletes" 
+                className="ha-category-link"
+              >
+                <h2 className="ha-category-title">HIGH SCHOOL ATHLETES</h2>
+                <p className="ha-category-description">Browse your favorite High School star</p>
+                <Link to="/high-school-athletes" className="ha-shop-now-button">
+                  SHOP NOW →
+                </Link>
+              </Link>
+            </div>
           </div>
-          <Link to="/influencers" className="influencers-shop-now-right">
-            Shop Now
-          </Link>
         </div>
-      </div>
-      
-      {/* High School Athletes Background Section */}
-      <div 
-        className="ha-background-section"
-        style={{ backgroundImage: `url(${haBg})` }}
-      >
-        <div className="ha-content-wrapper">
-          <div className="ha-text-content">
-            <Link 
-              to="/high-school-athletes" 
-              id="high-school-athletes" 
-              className="ha-category-link"
-            >
-              <h2 className="ha-category-title">HIGH SCHOOL ATHLETES</h2>
-              <p className="ha-category-description">Browse your favorite High School star</p>
-            </Link>
+        
+        {/* Teamwear Background Section */}
+        <div 
+          className="tw-background-section"
+          style={{ backgroundImage: `url(${twBg})` }}
+        >
+          <div className="tw-content-wrapper">
+            <div className="tw-text-content">
+              <Link 
+                to="/teamwear" 
+                id="teamwear" 
+                className="tw-category-link"
+              >
+                <h2 className="tw-category-title">TEAMWEAR</h2>
+                <p className="tw-category-description">Design custom uniforms for your squad and submit your teamwear request</p>
+                <Link to="/teamwear" className="tw-shop-now-button">
+                  START YOUR ORDER →
+                </Link>
+              </Link>
+            </div>
           </div>
-          <Link to="/high-school-athletes" className="ha-shop-now-right">
-            Shop Now
-          </Link>
-        </div>
-      </div>
-      
-      {/* Teamwear Background Section */}
-      <div 
-        className="tw-background-section"
-        style={{ backgroundImage: `url(${twBg})` }}
-      >
-        <div className="tw-content-wrapper">
-          <div className="tw-text-content">
-            <Link 
-              to="/teamwear" 
-              id="teamwear" 
-              className="tw-category-link"
-            >
-              <h2 className="tw-category-title">TEAMWEAR</h2>
-              <p className="tw-category-description">Design custom uniforms for your squad and submit your teamwear request</p>
-            </Link>
-          </div>
-          <Link to="/teamwear" className="tw-shop-now-right">
-            Start Your Order
-          </Link>
         </div>
       </div>
       

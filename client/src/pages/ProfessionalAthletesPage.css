@@ -324,7 +324,7 @@
 }
 
 .success-message-content svg {
-  color: #4ade80;
+  color: #bfff00;
   flex-shrink: 0;
 }
 
@@ -448,6 +448,12 @@
   color: #ffffff;
   text-align: center;
   margin: 8px 0 0 0;
+}
+
+.athlete-price-overlay.coming-soon-text {
+  font-style: italic;
+  letter-spacing: 2px;
+  opacity: 0.9;
 }
 
 .modal-description {

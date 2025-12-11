@@ -122,10 +122,19 @@
   }
 }
 
-/* PA Background Section */
-.pa-background-section {
+/* PA and Influencers Grid Container */
+.pa-influencers-grid {
+  display: flex;
   width: 100%;
   height: 390px;
+  margin: 0;
+  padding: 0;
+}
+
+/* PA Background Section */
+.pa-background-section {
+  width: 50%;
+  height: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -141,7 +150,7 @@
 }
 
 .pa-background-section:hover {
-  border: 3px solid #00ff00;
+  border: 3px solid #bfff00;
   box-sizing: border-box;
 }
 
@@ -160,59 +169,79 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1200px;
+  height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-}
-
-.pa-shop-now-left {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: 600;
-  color: #ffffff;
-  text-decoration: none;
-  transition: color 0.3s ease, transform 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  letter-spacing: 2px;
-}
-
-.pa-shop-now-left:hover {
-  color: #00ff00;
-  transform: scale(1.05);
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 40px 40px;
 }
 
 .pa-text-content {
-  text-align: right;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .pa-category-link {
   text-decoration: none;
   color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .pa-category-title {
-  font-size: 48px;
-  font-weight: bold;
+  font-size: 64px;
+  font-weight: 900;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.1;
   color: #ffffff;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 3px;
+  text-shadow: 
+    0 0 1px rgba(255, 255, 255, 0.5),
+    0 0 2px rgba(255, 255, 255, 0.3),
+    1px 1px 0px rgba(0, 0, 0, 0.8),
+    2px 2px 4px rgba(0, 0, 0, 0.6);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .pa-category-description {
   font-size: 16px;
   font-weight: 400;
-  margin: 10px 0 0 0;
+  margin: 0;
   color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+.pa-shop-now-button {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #bfff00;
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+.pa-shop-now-button:hover {
+  color: #d4ff4d;
+  transform: translateX(4px);
 }
 
 /* Influencers Background Section */
 .influencers-background-section {
-  width: 100%;
-  height: 390px;
+  width: 50%;
+  height: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -239,7 +268,7 @@
 }
 
 .influencers-background-section:hover {
-  border: 3px solid #00ff00;
+  border: 3px solid #bfff00;
   box-sizing: border-box;
 }
 
@@ -247,59 +276,88 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1200px;
+  height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 40px 40px;
 }
 
 .influencers-text-content {
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .influencers-category-link {
   text-decoration: none;
   color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .influencers-category-title {
-  font-size: 48px;
-  font-weight: bold;
+  font-size: 64px;
+  font-weight: 900;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.1;
   color: #ffffff;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 3px;
+  text-shadow: 
+    0 0 1px rgba(255, 255, 255, 0.5),
+    0 0 2px rgba(255, 255, 255, 0.3),
+    1px 1px 0px rgba(0, 0, 0, 0.8),
+    2px 2px 4px rgba(0, 0, 0, 0.6);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .influencers-category-description {
   font-size: 16px;
   font-weight: 400;
-  margin: 10px 0 0 0;
+  margin: 0;
   color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+  opacity: 0.95;
 }
 
-.influencers-shop-now-right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: 600;
-  color: #ffffff;
+.influencers-shop-now-button {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #bfff00;
   text-decoration: none;
   transition: color 0.3s ease, transform 0.2s ease;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 8px;
+  align-self: flex-start;
 }
 
-.influencers-shop-now-right:hover {
-  color: #00ff00;
-  transform: scale(1.05);
+.influencers-shop-now-button:hover {
+  color: #d4ff4d;
+  transform: translateX(4px);
+}
+
+/* High School Athletes and Teamwear Grid Container */
+.ha-tw-grid {
+  display: flex;
+  width: 100%;
+  height: 390px;
+  margin: 0;
+  padding: 0;
 }
 
 /* High School Athletes Background Section */
 .ha-background-section {
-  width: 100%;
-  height: 390px;
+  width: 50%;
+  height: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -326,7 +384,7 @@
 }
 
 .ha-background-section:hover {
-  border: 3px solid #00ff00;
+  border: 3px solid #bfff00;
   box-sizing: border-box;
 }
 
@@ -334,59 +392,79 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1200px;
+  height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 40px 40px;
 }
 
 .ha-text-content {
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .ha-category-link {
   text-decoration: none;
   color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .ha-category-title {
-  font-size: 48px;
-  font-weight: bold;
+  font-size: 64px;
+  font-weight: 900;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.1;
   color: #ffffff;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 3px;
+  text-shadow: 
+    0 0 1px rgba(255, 255, 255, 0.5),
+    0 0 2px rgba(255, 255, 255, 0.3),
+    1px 1px 0px rgba(0, 0, 0, 0.8),
+    2px 2px 4px rgba(0, 0, 0, 0.6);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .ha-category-description {
   font-size: 16px;
   font-weight: 400;
-  margin: 10px 0 0 0;
+  margin: 0;
   color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+  opacity: 0.95;
 }
 
-.ha-shop-now-right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: 600;
-  color: #ffffff;
+.ha-shop-now-button {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #bfff00;
   text-decoration: none;
   transition: color 0.3s ease, transform 0.2s ease;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 8px;
+  align-self: flex-start;
 }
 
-.ha-shop-now-right:hover {
-  color: #00ff00;
-  transform: scale(1.05);
+.ha-shop-now-button:hover {
+  color: #d4ff4d;
+  transform: translateX(4px);
 }
 
 /* Teamwear Background Section */
 .tw-background-section {
-  width: 100%;
-  height: 390px;
+  width: 50%;
+  height: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -399,7 +477,6 @@
   border: 0 solid transparent;
   transition: border-color 0.3s ease;
   box-sizing: border-box;
-  margin-bottom: 0;
 }
 
 .tw-background-section::before {
@@ -414,7 +491,7 @@
 }
 
 .tw-background-section:hover {
-  border: 3px solid #00ff00;
+  border: 3px solid #bfff00;
   box-sizing: border-box;
 }
 
@@ -422,53 +499,73 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1200px;
+  height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 0 40px 40px;
 }
 
 .tw-text-content {
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .tw-category-link {
   text-decoration: none;
   color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .tw-category-title {
-  font-size: 48px;
-  font-weight: bold;
+  font-size: 64px;
+  font-weight: 900;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.1;
   color: #ffffff;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  letter-spacing: 3px;
+  text-shadow: 
+    0 0 1px rgba(255, 255, 255, 0.5),
+    0 0 2px rgba(255, 255, 255, 0.3),
+    1px 1px 0px rgba(0, 0, 0, 0.8),
+    2px 2px 4px rgba(0, 0, 0, 0.6);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .tw-category-description {
   font-size: 16px;
   font-weight: 400;
-  margin: 10px 0 0 0;
+  margin: 0;
   color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+  opacity: 0.95;
 }
 
-.tw-shop-now-right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: 600;
-  color: #ffffff;
+.tw-shop-now-button {
+  display: inline-block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #bfff00;
   text-decoration: none;
   transition: color 0.3s ease, transform 0.2s ease;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 8px;
+  align-self: flex-start;
 }
 
-.tw-shop-now-right:hover {
-  color: #00ff00;
-  transform: scale(1.05);
+.tw-shop-now-button:hover {
+  color: #d4ff4d;
+  transform: translateX(4px);
 }
 
 /* Shop Section */
@@ -658,8 +755,8 @@
 }
 
 .feed-item-status.status-active {
-  color: #4ade80;
-  border-color: #4ade80;
+  color: #bfff00;
+  border-color: #bfff00;
 }
 
 .feed-item-status.status-draft {
@@ -821,11 +918,24 @@
   
   .shop-now-left-teamwear,
   .shop-now-right-teamwear,
-  .pa-shop-now-left,
-  .influencers-shop-now-right,
-  .ha-shop-now-right,
-  .tw-shop-now-right {
-    font-size: 30px;
+  .pa-category-title {
+    font-size: 48px;
+  }
+  
+  .pa-shop-now-button {
+    font-size: 16px;
+  }
+  
+  .influencers-category-title,
+  .ha-category-title,
+  .tw-category-title {
+    font-size: 48px;
+  }
+  
+  .influencers-shop-now-button,
+  .ha-shop-now-button,
+  .tw-shop-now-button {
+    font-size: 16px;
   }
   
   .about-us-section {
@@ -873,9 +983,24 @@
   
   .shop-now-left-teamwear,
   .shop-now-right-teamwear,
-  .pa-shop-now-left,
-  .influencers-shop-now-right {
-    font-size: 28px;
+  .pa-category-title {
+    font-size: 42px;
+  }
+  
+  .pa-shop-now-button {
+    font-size: 15px;
+  }
+  
+  .influencers-category-title,
+  .ha-category-title,
+  .tw-category-title {
+    font-size: 42px;
+  }
+  
+  .influencers-shop-now-button,
+  .ha-shop-now-button,
+  .tw-shop-now-button {
+    font-size: 15px;
   }
   
   .about-us-section {
@@ -961,9 +1086,24 @@
   
   .shop-now-left-teamwear,
   .shop-now-right-teamwear,
-  .pa-shop-now-left,
-  .influencers-shop-now-right {
-    font-size: 26px;
+  .pa-category-title {
+    font-size: 36px;
+  }
+  
+  .pa-shop-now-button {
+    font-size: 14px;
+  }
+  
+  .influencers-category-title,
+  .ha-category-title,
+  .tw-category-title {
+    font-size: 36px;
+  }
+  
+  .influencers-shop-now-button,
+  .ha-shop-now-button,
+  .tw-shop-now-button {
+    font-size: 14px;
   }
   
   .about-us-section {
@@ -983,6 +1123,20 @@
 
 /* Small Screens / Mobile Landscape */
 @media (max-width: 768px) {
+  .pa-influencers-grid,
+  .ha-tw-grid {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .pa-background-section,
+  .influencers-background-section,
+  .ha-background-section,
+  .tw-background-section {
+    width: 100%;
+    height: 390px;
+  }
+  
   .homepage-content {
     width: 100%;
     height: calc(100vh - 70px);
@@ -1137,9 +1291,24 @@
   
   .shop-now-left-teamwear,
   .shop-now-right-teamwear,
-  .pa-shop-now-left,
-  .influencers-shop-now-right {
-    font-size: 24px;
+  .pa-category-title {
+    font-size: 32px;
+  }
+  
+  .pa-shop-now-button {
+    font-size: 13px;
+  }
+  
+  .influencers-category-title,
+  .ha-category-title,
+  .tw-category-title {
+    font-size: 32px;
+  }
+  
+  .influencers-shop-now-button,
+  .ha-shop-now-button,
+  .tw-shop-now-button {
+    font-size: 13px;
   }
 }
 
@@ -1261,9 +1430,24 @@
 
   .shop-now-left-teamwear,
   .shop-now-right-teamwear,
-  .pa-shop-now-left,
-  .influencers-shop-now-right {
-    font-size: 22px;
+  .pa-category-title {
+    font-size: 28px;
+  }
+  
+  .pa-shop-now-button {
+    font-size: 12px;
+  }
+  
+  .influencers-category-title,
+  .ha-category-title,
+  .tw-category-title {
+    font-size: 28px;
+  }
+  
+  .influencers-shop-now-button,
+  .ha-shop-now-button,
+  .tw-shop-now-button {
+    font-size: 12px;
   }
 }
 
@@ -1341,9 +1525,24 @@
 
   .shop-now-left-teamwear,
   .shop-now-right-teamwear,
-  .pa-shop-now-left,
-  .influencers-shop-now-right {
-    font-size: 20px;
+  .pa-category-title {
+    font-size: 24px;
+  }
+  
+  .pa-shop-now-button {
+    font-size: 11px;
+  }
+  
+  .influencers-category-title,
+  .ha-category-title,
+  .tw-category-title {
+    font-size: 24px;
+  }
+  
+  .influencers-shop-now-button,
+  .ha-shop-now-button,
+  .tw-shop-now-button {
+    font-size: 11px;
   }
   
   .about-us-section {

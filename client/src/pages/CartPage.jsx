@@ -11,15 +11,10 @@ const CartPage = () => {
   const [promoError, setPromoError] = useState('')
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [emptyCartError, setEmptyCartError] = useState(false)
+  const [applyingPromo, setApplyingPromo] = useState(false)
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
-  // Example promo codes (you can expand this)
-  const validPromoCodes = {
-    'WELCOME10': 0.1, // 10% off
-    'SAVE20': 0.2,   // 20% off
-    'JERZEY15': 0.15 // 15% off
-  }
-
-  const handleApplyPromo = () => {
+  const handleApplyPromo = async () => {
     const code = promoCode.trim().toUpperCase()
     setPromoError('')
 
@@ -33,15 +28,39 @@ const CartPage = () => {
       return
     }
 
-    if (validPromoCodes[code]) {
-      const discount = validPromoCodes[code]
-      setAppliedPromo({
-        code: code,
-        discount: discount
+    try {
+      setApplyingPromo(true)
+      const subtotal = getCartTotal()
+      const response = await fetch(`${API_URL}/api/promo-codes/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          code: code,
+          subtotal: subtotal
+        })
       })
-      setPromoCode('')
-    } else {
-      setPromoError('Invalid promo code')
+
+      const data = await response.json()
+
+      if (data.valid) {
+        setAppliedPromo({
+          code: data.promoCode.code,
+          discount: data.discount,
+          discountType: data.promoCode.discountType,
+          discountValue: data.promoCode.discountValue
+        })
+        setPromoCode('')
+        setPromoError('')
+      } else {
+        setPromoError(data.error || 'Invalid promo code')
+      }
+    } catch (error) {
+      console.error('Failed to validate promo code:', error)
+      setPromoError('Failed to validate promo code. Please try again.')
+    } finally {
+      setApplyingPromo(false)
     }
   }
 
@@ -53,7 +72,7 @@ const CartPage = () => {
 
   const getDiscountAmount = () => {
     if (!appliedPromo) return 0
-    return getCartTotal() * appliedPromo.discount
+    return appliedPromo.discount
   }
 
   const getFinalTotal = () => {
@@ -244,8 +263,9 @@ const CartPage = () => {
                       type="button"
                       className="apply-promo-button"
                       onClick={handleApplyPromo}
+                      disabled={applyingPromo}
                     >
-                      Apply
+                      {applyingPromo ? 'Applying...' : 'Apply'}
                     </button>
                   </div>
                 ) : (

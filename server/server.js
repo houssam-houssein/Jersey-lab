@@ -9,12 +9,17 @@ import Admin from './models/Admin.js'
 import Category from './models/Category.js'
 import TeamwearInquiry from './models/TeamwearInquiry.js'
 import User from './models/User.js'
+import PromoCode from './models/PromoCode.js'
+import { sendWelcomeEmail, verifyEmailConfig } from './utils/emailService.js'
 
 dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5000
+// Default to local MongoDB for development
+// To use MongoDB Atlas, set MONGODB_URI in .env file with your Atlas connection string
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/Jerseylab'
+const isLocalMongoDB = !MONGODB_URI.includes('mongodb.net') && !MONGODB_URI.includes('mongodb+srv')
 
 const defaultOrigins = [
   'http://localhost:5173',
@@ -53,22 +58,38 @@ app.use(session({
   }
 }))
 
-// Mongo connection with Atlas-optimized options and connection pooling
-mongoose.connect(MONGODB_URI, {
-  retryWrites: true,
-  w: 'majority',
-  // Connection pool settings for better performance
-  maxPoolSize: 10, // Maintain up to 10 socket connections
-  minPoolSize: 2, // Maintain at least 2 socket connections
-  serverSelectionTimeoutMS: 5000, // How long to try selecting a server
-  socketTimeoutMS: 45000, // How long a send or receive on a socket can take before timing out
-  connectTimeoutMS: 10000, // How long to wait for initial connection
-  // Keep connections alive
-  heartbeatFrequencyMS: 10000
-}).then(() => {
-  console.log('Connected to MongoDB Atlas')
+// Mongo connection - optimized for local or Atlas based on connection string
+const connectionOptions = isLocalMongoDB
+  ? {
+      // Local MongoDB options (simpler, faster for dev)
+      serverSelectionTimeoutMS: 2000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 2000
+    }
+  : {
+      // MongoDB Atlas options (optimized for cloud)
+      retryWrites: true,
+      w: 'majority',
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      heartbeatFrequencyMS: 10000
+    }
+
+mongoose.connect(MONGODB_URI, connectionOptions).then(() => {
+  console.log(`✅ Connected to ${isLocalMongoDB ? 'Local MongoDB' : 'MongoDB Atlas'}`)
+  if (isLocalMongoDB) {
+    console.log('📍 Database: Jerseylab (localhost:27017)')
+  }
 }).catch((error) => {
-  console.error('MongoDB connection error:', error)
+  console.error('❌ MongoDB connection error:', error.message)
+  if (isLocalMongoDB) {
+    console.error('💡 Make sure MongoDB is running locally: mongod')
+  } else {
+    console.error('💡 Check your MongoDB Atlas connection string and IP whitelist')
+  }
   process.exit(1)
 })
 
@@ -115,6 +136,11 @@ if (hasGoogleKeys) {
           user.lastLogin = new Date()
           user.loginCount = 1
           await user.save()
+          
+          // Send welcome email for new signup via Google
+          sendWelcomeEmail(user.email, user.name).catch(err => 
+            console.error('Failed to send welcome email:', err)
+          )
         } else {
           // User exists and has signed up - regular login
           user.googleId = googleId
@@ -138,6 +164,11 @@ if (hasGoogleKeys) {
           lastLogin: new Date(),
           loginCount: 1
         })
+        
+        // Send welcome email for new signup via Google
+        sendWelcomeEmail(user.email, user.name).catch(err => 
+          console.error('Failed to send welcome email:', err)
+        )
       }
 
       // Return user object for session (without mongoose document methods)
@@ -399,6 +430,12 @@ app.post('/api/auth/signup', async (req, res) => {
         existingUser.hasSignedUp = true
         existingUser.provider = password ? 'local' : 'google'
         await existingUser.save()
+        
+        // Send welcome email (don't wait for it to complete)
+        sendWelcomeEmail(existingUser.email, existingUser.name).catch(err => 
+          console.error('Failed to send welcome email:', err)
+        )
+        
         return res.json({ 
           message: 'Signup successful. You can now log in.',
           user: {
@@ -425,6 +462,11 @@ app.post('/api/auth/signup', async (req, res) => {
     }
 
     const user = await User.create(userData)
+
+    // Send welcome email (don't wait for it to complete - non-blocking)
+    sendWelcomeEmail(user.email, user.name).catch(err => 
+      console.error('Failed to send welcome email:', err)
+    )
 
     res.json({ 
       message: password ? 'Signup successful! You can now log in.' : 'Signup successful. You can now log in with Google.',
@@ -569,6 +611,116 @@ app.get('/api/auth/user', (req, res) => {
   }
 })
 
+// Admin: Get all users
+app.get('/api/admin/users', async (req, res) => {
+  try {
+    const users = await User.find()
+      .select('-password') // Exclude password from response
+      .sort({ createdAt: -1 })
+      .lean()
+    res.json(users)
+  } catch (error) {
+    console.error('Failed to fetch users:', error)
+    res.status(500).json({ error: 'Failed to fetch users' })
+  }
+})
+
+// Admin: Promo Code Management
+// Get all promo codes
+app.get('/api/admin/promo-codes', async (req, res) => {
+  try {
+    const promoCodes = await PromoCode.find().sort({ createdAt: -1 })
+    res.json(promoCodes)
+  } catch (error) {
+    console.error('Failed to fetch promo codes:', error)
+    res.status(500).json({ error: 'Failed to fetch promo codes' })
+  }
+})
+
+// Create new promo code
+app.post('/api/admin/promo-codes', async (req, res) => {
+  try {
+    const promoCode = await PromoCode.create(req.body)
+    res.status(201).json(promoCode)
+  } catch (error) {
+    console.error('Failed to create promo code:', error)
+    if (error.code === 11000) {
+      return res.status(400).json({ error: 'Promo code already exists' })
+    }
+    res.status(500).json({ error: 'Failed to create promo code', details: error.message })
+  }
+})
+
+// Update promo code
+app.put('/api/admin/promo-codes/:id', async (req, res) => {
+  try {
+    const promoCode = await PromoCode.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    )
+    if (!promoCode) {
+      return res.status(404).json({ error: 'Promo code not found' })
+    }
+    res.json(promoCode)
+  } catch (error) {
+    console.error('Failed to update promo code:', error)
+    res.status(500).json({ error: 'Failed to update promo code', details: error.message })
+  }
+})
+
+// Delete promo code
+app.delete('/api/admin/promo-codes/:id', async (req, res) => {
+  try {
+    const promoCode = await PromoCode.findByIdAndDelete(req.params.id)
+    if (!promoCode) {
+      return res.status(404).json({ error: 'Promo code not found' })
+    }
+    res.json({ message: 'Promo code deleted successfully' })
+  } catch (error) {
+    console.error('Failed to delete promo code:', error)
+    res.status(500).json({ error: 'Failed to delete promo code' })
+  }
+})
+
+// Public: Validate promo code
+app.post('/api/promo-codes/validate', async (req, res) => {
+  try {
+    const { code, subtotal } = req.body
+    const promoCode = await PromoCode.findOne({ code: code.toUpperCase() })
+    
+    if (!promoCode) {
+      return res.json({ valid: false, error: 'Promo code not found' })
+    }
+    
+    if (!promoCode.isValid()) {
+      return res.json({ valid: false, error: 'Promo code is not active or has expired' })
+    }
+    
+    if (subtotal < promoCode.minPurchaseAmount) {
+      return res.json({ 
+        valid: false, 
+        error: `Minimum purchase amount of $${promoCode.minPurchaseAmount} required` 
+      })
+    }
+    
+    const discount = promoCode.calculateDiscount(subtotal)
+    
+    res.json({
+      valid: true,
+      discount,
+      promoCode: {
+        code: promoCode.code,
+        discountType: promoCode.discountType,
+        discountValue: promoCode.discountValue
+      }
+    })
+  } catch (error) {
+    console.error('Failed to validate promo code:', error)
+    res.status(500).json({ error: 'Failed to validate promo code' })
+  }
+})
+
 // Logout
 app.post('/api/auth/logout', (req, res) => {
   req.logout((err) => {
@@ -580,8 +732,11 @@ app.post('/api/auth/logout', (req, res) => {
 })
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`)
   console.log(`Google OAuth callback URL: ${process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'}`)
+  
+  // Verify email configuration on startup
+  await verifyEmailConfig()
 })
 

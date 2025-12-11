@@ -6,7 +6,6 @@ import logo from '../assets/images/logo.png'
 import './Navbar.css'
 
 const Navbar = () => {
-  const [searchQuery, setSearchQuery] = useState('')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
@@ -18,13 +17,6 @@ const Navbar = () => {
     await logout()
     navigate('/')
   }
-
-  const handleSearch = (e) => {
-    e.preventDefault()
-    // Handle search functionality
-    console.log('Searching for:', searchQuery)
-  }
-
 
   const handleAboutUsClick = (e) => {
     e.preventDefault()
@@ -104,45 +96,8 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Burger Menu Button - Mobile */}
-          <button 
-            className="burger-menu-button"
-            onClick={toggleMobileMenu}
-            aria-label="Toggle menu"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              {isMobileMenuOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </>
-              )}
-            </svg>
-          </button>
-
-          {/* Search and Login */}
+          {/* Cart, Menu Button, and Login - Mobile */}
           <div className="navbar-right">
-            <form onSubmit={handleSearch} className="search-form">
-              <input
-                type="text"
-                placeholder="SEARCH..."
-                className="search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button type="submit" className="search-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="m21 21-4.35-4.35"></path>
-                </svg>
-              </button>
-            </form>
             <Link to="/cart" className="cart-link">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="9" cy="21" r="1"></circle>
@@ -153,44 +108,70 @@ const Navbar = () => {
                 <span className="cart-badge">{cartItemCount}</span>
               )}
             </Link>
-            {authenticated && user ? (
-              <div className="user-menu">
-                <div className="user-info">
-                  {user.picture ? (
-                    <img 
-                      src={user.picture} 
-                      alt={user.name} 
-                      className="user-avatar"
-                      onError={(e) => {
-                        // If image fails to load, hide it or show a fallback
-                        e.target.style.display = 'none'
-                      }}
-                    />
-                  ) : (
-                    <div className="user-avatar-fallback">
-                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                  )}
-                  <span className="user-name">{user.name}</span>
+            
+            {/* Burger Menu Button - Mobile */}
+            <button 
+              className="burger-menu-button"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle menu"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                {isMobileMenuOpen ? (
+                  <>
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </>
+                ) : (
+                  <>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                  </>
+                )}
+              </svg>
+            </button>
+
+            {/* Login/User Menu - Desktop Only */}
+            <div className="desktop-login-menu">
+              {authenticated && user ? (
+                <div className="user-menu">
+                  <div className="user-info">
+                    {user.picture ? (
+                      <img 
+                        src={user.picture} 
+                        alt={user.name} 
+                        className="user-avatar"
+                        onError={(e) => {
+                          // If image fails to load, hide it or show a fallback
+                          e.target.style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      <div className="user-avatar-fallback">
+                        {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                    )}
+                    <span className="user-name">{user.name}</span>
+                  </div>
+                  <button onClick={handleLogout} className="logout-button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Logout</span>
+                  </button>
                 </div>
-                <button onClick={handleLogout} className="logout-button">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
+              ) : (
+                <Link to="/login" className="login-link">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
                   </svg>
-                  <span>Logout</span>
-                </button>
-              </div>
-            ) : (
-              <Link to="/login" className="login-link">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>Log In</span>
-              </Link>
-            )}
+                  <span>Log In</span>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -227,6 +208,47 @@ const Navbar = () => {
             <Link to="/terms-conditions" className="mobile-nav-link" onClick={handleLinkClick}>
               TERMS & CONDITIONS
             </Link>
+          </div>
+          
+          {/* Mobile Login/User Menu */}
+          <div className="mobile-login-section">
+            {authenticated && user ? (
+              <div className="mobile-user-info">
+                <div className="mobile-user-details">
+                  {user.picture ? (
+                    <img 
+                      src={user.picture} 
+                      alt={user.name} 
+                      className="mobile-user-avatar"
+                      onError={(e) => {
+                        e.target.style.display = 'none'
+                      }}
+                    />
+                  ) : (
+                    <div className="mobile-user-avatar-fallback">
+                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                  )}
+                  <span className="mobile-user-name">{user.name}</span>
+                </div>
+                <button onClick={() => { handleLogout(); handleLinkClick(); }} className="mobile-logout-button">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" className="mobile-login-link" onClick={handleLinkClick}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Log In</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
