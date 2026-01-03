@@ -625,6 +625,87 @@ app.get('/api/admin/users', async (req, res) => {
   }
 })
 
+// Admin: Admin Management
+// Get all admins
+app.get('/api/admin/admins', async (req, res) => {
+  try {
+    console.log('Fetching admins from database...')
+    const admins = await Admin.find()
+      .select('-password') // Exclude password from response
+      .sort({ createdAt: -1 })
+      .lean()
+    
+    // Ensure _id is converted to string for JSON serialization
+    const formattedAdmins = admins.map(admin => ({
+      ...admin,
+      _id: admin._id.toString()
+    }))
+    
+    console.log(`Found ${formattedAdmins.length} admin(s)`)
+    res.json(formattedAdmins)
+  } catch (error) {
+    console.error('Failed to fetch admins:', error)
+    res.status(500).json({ error: 'Failed to fetch admins', details: error.message })
+  }
+})
+
+// Create new admin
+app.post('/api/admin/admins', async (req, res) => {
+  try {
+    const { email, password, name, role } = req.body
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' })
+    }
+
+    // Validate role if provided
+    const validRoles = ['owner', 'admin', 'manager', 'staff']
+    if (role && !validRoles.includes(role)) {
+      return res.status(400).json({ error: 'Invalid role. Must be one of: owner, admin, manager, staff' })
+    }
+
+    // Check if admin already exists
+    const existing = await Admin.findOne({ email: email.toLowerCase().trim() })
+    if (existing) {
+      return res.status(400).json({ error: 'Admin already exists with that email' })
+    }
+
+    // Create new admin (password will be hashed by the pre-save hook)
+    const admin = await Admin.create({
+      email: email.toLowerCase().trim(),
+      password,
+      name: name || 'Jerzey Lab Owner',
+      role: role || 'owner'
+    })
+
+    // Return admin without password
+    const adminResponse = admin.toObject()
+    delete adminResponse.password
+    res.status(201).json(adminResponse)
+  } catch (error) {
+    console.error('Failed to create admin:', error)
+    if (error.code === 11000) {
+      return res.status(400).json({ error: 'Admin already exists with that email' })
+    }
+    res.status(500).json({ error: 'Failed to create admin', details: error.message })
+  }
+})
+
+// Delete admin
+app.delete('/api/admin/admins/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const deletedAdmin = await Admin.findByIdAndDelete(id)
+    if (!deletedAdmin) {
+      return res.status(404).json({ error: 'Admin not found' })
+    }
+    res.status(204).send() // No content
+  } catch (error) {
+    console.error('Failed to delete admin:', error)
+    res.status(500).json({ error: 'Failed to delete admin', details: error.message })
+  }
+})
+
 // Admin: Promo Code Management
 // Get all promo codes
 app.get('/api/admin/promo-codes', async (req, res) => {

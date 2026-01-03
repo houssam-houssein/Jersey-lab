@@ -147,7 +147,7 @@ const HomePage = () => {
         style={{ backgroundImage: `url(${aboutBg})` }}
       >
         <div className="about-us-content">
-          <h2 className="about-us-title">Jerzey Lab</h2>
+          <h2 className="about-us-title">JerzeyLab</h2>
           <div className="about-us-text">
             <p className="about-us-paragraph">
               At Jerzey Lab, we believe jerseys are more than fabric. They're living stories of the game. Every player, from professional athletes to high school stars and basketball influencers, carries a legacy that deserves to be celebrated.

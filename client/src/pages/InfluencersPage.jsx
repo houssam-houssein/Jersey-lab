@@ -230,8 +230,8 @@ const InfluencersPage = () => {
         <p className="collab-copy">
           Pitch your concept, launch drop-ready merch, and tap into the Jerzey LAB production network.
         </p>
-        <a className="collab-link" href="mailto:collabs@jerzeylab.com">
-          collabs@jerzeylab.com
+        <a className="collab-link" href="mailto:info@jerseylab.com">
+          info@jerseylab.com
         </a>
       </section>
 

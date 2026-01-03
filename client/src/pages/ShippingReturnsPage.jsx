@@ -31,7 +31,7 @@ const ShippingReturnsPage = () => {
         <section className="policy-item">
           <h2 className="policy-item-title">Contact</h2>
           <p className="policy-item-value">
-            <a href="mailto:support@jerzeylab.com" className="contact-link">support@jerzeylab.com</a>
+            <a href="mailto:info@jerseylab.com" className="contact-link">info@jerseylab.com</a>
           </p>
         </section>
       </div>

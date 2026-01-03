@@ -79,7 +79,7 @@ const statusToSlug = (status = '') => status.toLowerCase().replace(/\s+/g, '-') 
 
 const AdminDashboardPage = () => {
   const navigate = useNavigate()
-  const [activeSection, setActiveSection] = useState('orders') // 'orders', 'users', 'catalog', 'inquiries', 'promocodes'
+  const [activeSection, setActiveSection] = useState('orders') // 'orders', 'users', 'catalog', 'inquiries', 'promocodes', 'admins'
   const [orders, setOrders] = useState(initialOrders)
   const [catalog, setCatalog] = useState(initialCatalog)
   const [orderStatusFilter, setOrderStatusFilter] = useState('all') // 'all', 'Pending', 'Processing', 'Completed', 'Cancelled'
@@ -96,6 +96,15 @@ const AdminDashboardPage = () => {
   const [promoCodes, setPromoCodes] = useState([])
   const [loadingPromoCodes, setLoadingPromoCodes] = useState(true)
   const [editingPromoCode, setEditingPromoCode] = useState(null)
+  const [admins, setAdmins] = useState([])
+  const [loadingAdmins, setLoadingAdmins] = useState(true)
+  const [adminForm, setAdminForm] = useState({
+    email: '',
+    password: '',
+    name: '',
+    role: 'owner'
+  })
+  const [savingAdmin, setSavingAdmin] = useState(false)
   const [promoCodeForm, setPromoCodeForm] = useState({
     code: '',
     description: '',
@@ -243,6 +252,93 @@ const AdminDashboardPage = () => {
       fetchPromoCodes()
     }
   }, [activeSection, fetchPromoCodes])
+
+  const fetchAdmins = useCallback(async () => {
+    try {
+      setLoadingAdmins(true)
+      const response = await fetch(`${API_URL}/api/admin/admins`, {
+        credentials: 'include'
+      })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to fetch admins' }))
+        throw new Error(errorData.error || 'Failed to fetch admins')
+      }
+      const data = await response.json()
+      console.log('Fetched admins:', data)
+      setAdmins(Array.isArray(data) ? data : [])
+    } catch (error) {
+      console.error('Failed to fetch admins:', error)
+      setAdmins([])
+      setStatusMessage({ text: `Failed to load admins: ${error.message}`, type: 'error' })
+    } finally {
+      setLoadingAdmins(false)
+    }
+  }, [API_URL])
+
+  useEffect(() => {
+    if (activeSection === 'admins') {
+      fetchAdmins()
+    }
+  }, [activeSection, fetchAdmins])
+
+  const handleAdminSubmit = async (e) => {
+    e.preventDefault()
+    setSavingAdmin(true)
+    setStatusMessage({ text: '', type: '' })
+
+    try {
+      const response = await fetch(`${API_URL}/api/admin/admins`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: adminForm.email,
+          password: adminForm.password,
+          name: adminForm.name || undefined,
+          role: adminForm.role
+        }),
+        credentials: 'include'
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setStatusMessage({ text: 'Admin created successfully!', type: 'success' })
+        setAdminForm({ email: '', password: '', name: '', role: 'owner' })
+        fetchAdmins() // Refresh the list
+      } else {
+        setStatusMessage({ text: data.error || 'Failed to create admin', type: 'error' })
+      }
+    } catch (error) {
+      console.error('Error creating admin:', error)
+      setStatusMessage({ text: 'An error occurred while creating the admin.', type: 'error' })
+    } finally {
+      setSavingAdmin(false)
+    }
+  }
+
+  const handleDeleteAdmin = async (adminId) => {
+    if (!window.confirm('Are you sure you want to delete this admin? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/admin/admins/${adminId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      if (response.ok) {
+        setStatusMessage({ text: 'Admin deleted successfully!', type: 'success' })
+        fetchAdmins() // Refresh the list
+      } else {
+        const data = await response.json()
+        setStatusMessage({ text: data.error || 'Failed to delete admin', type: 'error' })
+      }
+    } catch (error) {
+      console.error('Error deleting admin:', error)
+      setStatusMessage({ text: 'An error occurred while deleting the admin.', type: 'error' })
+    }
+  }
 
   const handlePromoCodeSubmit = async (e) => {
     e.preventDefault()
@@ -601,6 +697,121 @@ const AdminDashboardPage = () => {
                 ))}
               </div>
             )}
+          </section>
+        )
+
+      case 'admins':
+        return (
+          <section className='catalog-panel'>
+            <div className='panel-header'>
+              <div>
+                <p className='eyebrow'>ADMIN MANAGEMENT</p>
+                <h2>Admin Accounts</h2>
+                <p className='subheading compact'>
+                  Create and manage admin accounts for the dashboard.
+                </p>
+              </div>
+            </div>
+
+            {statusMessage.text && (
+              <div className={`admin-toast ${statusMessage.type}`} style={{ marginBottom: '20px' }}>
+                {statusMessage.text}
+              </div>
+            )}
+
+            <form className='promo-code-form' onSubmit={handleAdminSubmit}>
+              <div className='form-row'>
+                <div className='form-group'>
+                  <label>Email *</label>
+                  <input
+                    type='email'
+                    value={adminForm.email}
+                    onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+                    placeholder='admin@jerzeylab.com'
+                    required
+                  />
+                </div>
+                <div className='form-group'>
+                  <label>Password *</label>
+                  <input
+                    type='password'
+                    value={adminForm.password}
+                    onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+                    placeholder='Enter password'
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div className='form-group'>
+                  <label>Name (Optional)</label>
+                  <input
+                    type='text'
+                    value={adminForm.name}
+                    onChange={(e) => setAdminForm({ ...adminForm, name: e.target.value })}
+                    placeholder='Jerzey Lab Owner'
+                  />
+                </div>
+              </div>
+
+              <div className='form-row'>
+                <div className='form-group'>
+                  <label>Role *</label>
+                  <select
+                    value={adminForm.role}
+                    onChange={(e) => setAdminForm({ ...adminForm, role: e.target.value })}
+                    required
+                  >
+                    <option value='owner'>Owner</option>
+                    <option value='admin'>Admin</option>
+                    <option value='manager'>Manager</option>
+                    <option value='staff'>Staff</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className='form-actions'>
+                <button type='submit' className='primary-button' disabled={savingAdmin}>
+                  {savingAdmin ? 'Creating...' : 'Create Admin'}
+                </button>
+              </div>
+            </form>
+
+            <div className='promo-codes-list' style={{ marginTop: '40px' }}>
+              <h3>Existing Admins</h3>
+              {loadingAdmins ? (
+                <div className='catalog-loading'>Loading admins…</div>
+              ) : admins.length === 0 ? (
+                <div className='empty-state'>
+                  <p>No admins found.</p>
+                </div>
+              ) : (
+                <div className='orders-table admins-table'>
+                  <div className='orders-row orders-header'>
+                    <span>Name</span>
+                    <span>Email</span>
+                    <span>Role</span>
+                    <span>Created</span>
+                    <span>Actions</span>
+                  </div>
+                  {admins.map(admin => (
+                    <div key={admin._id} className='orders-row'>
+                      <span>{admin.name || 'N/A'}</span>
+                      <span>{admin.email}</span>
+                      <span>{admin.role || 'owner'}</span>
+                      <span>{admin.createdAt ? new Date(admin.createdAt).toLocaleDateString() : 'N/A'}</span>
+                      <span className='panel-actions'>
+                        <button 
+                          className='danger-link small' 
+                          onClick={() => handleDeleteAdmin(admin._id)}
+                        >
+                          Delete
+                        </button>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </section>
         )
 
@@ -1102,6 +1313,13 @@ const AdminDashboardPage = () => {
             >
               <span>🎟️</span>
               <span>Promo Codes</span>
+            </button>
+            <button
+              className={`sidebar-menu-item ${activeSection === 'admins' ? 'active' : ''}`}
+              onClick={() => setActiveSection('admins')}
+            >
+              <span>👤</span>
+              <span>Admins</span>
             </button>
           </nav>
         </aside>

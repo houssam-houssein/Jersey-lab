@@ -61,7 +61,7 @@ const TermsConditionsPage = () => {
             <li>You receive an incorrect item due to our mistake.</li>
           </ul>
           <p className="terms-paragraph">
-            If this happens, please contact us within 7 days of delivery at <a href="mailto:support@jerzeylab.com" className="contact-link">support@jerzeylab.com</a> with your order number, photos of the issue, and a description of the problem.
+            If this happens, please contact us within 7 days of delivery at <a href="mailto:info@jerseylab.com" className="contact-link">info@jerseylab.com</a> with your order number, photos of the issue, and a description of the problem.
           </p>
           <p className="terms-paragraph">
             We will review your case and arrange for a replacement or refund if applicable.
@@ -102,7 +102,7 @@ const TermsConditionsPage = () => {
             For any questions or concerns, please contact us at:
           </p>
           <ul className="contact-list">
-            <li>📧 <a href="mailto:support@jerzeylab.com" className="contact-link">support@jerzeylab.com</a></li>
+            <li>📧 <a href="mailto:info@jerseylab.com" className="contact-link">info@jerseylab.com</a></li>
             <li>🌐 <a href="/" className="contact-link">jerzeylab.com</a></li>
           </ul>
         </section>

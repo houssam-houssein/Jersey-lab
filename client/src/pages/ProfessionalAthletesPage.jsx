@@ -231,8 +231,8 @@ const ProfessionalAthletesPage = () => {
         <p className="support-copy">
           Contact our concierge team for player-signed memorabilia, bulk orders, or jersey personalization.
         </p>
-        <a className="support-link" href="mailto:sales@jerzeylab.com">
-          sales@jerzeylab.com
+        <a className="support-link" href="mailto:info@jerseylab.com">
+          info@jerseylab.com
         </a>
       </section>
 

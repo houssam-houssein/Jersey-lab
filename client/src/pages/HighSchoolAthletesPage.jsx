@@ -230,8 +230,8 @@ const HighSchoolAthletesPage = () => {
         <p className="programs-copy">
           Launch team stores, fundraise with specialty merch, and unlock pro-grade production with Jerzey LAB.
         </p>
-        <a className="programs-link" href="mailto:teams@jerzeylab.com">
-          teams@jerzeylab.com
+        <a className="programs-link" href="mailto:info@jerseylab.com">
+          info@jerseylab.com
         </a>
       </section>
 

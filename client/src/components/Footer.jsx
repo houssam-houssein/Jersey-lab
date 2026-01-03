@@ -29,8 +29,7 @@ const Footer = () => {
           <div className="footer-section">
             <h3 className="footer-title">CONTACT</h3>
             <ul className="footer-links">
-              <li><a href="mailto:support@jerzeylab.com">support@jerzeylab.com</a></li>
-              <li><a href="mailto:sales@jerzeylab.com">sales@jerzeylab.com</a></li>
+              <li><a href="mailto:info@jerseylab.com">info@jerseylab.com</a></li>
             </ul>
           </div>
         </div>
