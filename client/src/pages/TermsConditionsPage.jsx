@@ -24,7 +24,7 @@ const TermsConditionsPage = () => {
         <section className="terms-section">
           <h2 className="section-title">2. Products</h2>
           <p className="terms-paragraph">
-            Our store sells NBA-inspired shirts and merchandise. All items are described and photographed as accurately as possible, but colors or designs may vary slightly due to different display settings or production variations.
+            Our store sells custom merchandise. All items are described and photographed as accurately as possible, but colors or designs may vary slightly due to different display settings or production variations.
           </p>
         </section>
 
