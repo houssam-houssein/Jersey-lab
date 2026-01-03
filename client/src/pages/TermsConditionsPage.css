@@ -103,12 +103,12 @@
   color: #ffffff;
   text-decoration: underline;
   text-decoration-color: rgba(255, 255, 255, 0.5);
-  transition: all 0.3s ease;
+  transition: color 0.3s ease, text-decoration-color 0.3s ease;
 }
 
 .contact-link:hover {
-  text-decoration-color: #ffffff;
-  opacity: 0.8;
+  color: #bfff00;
+  text-decoration-color: #bfff00;
 }
 
 /* Responsive adjustments - Large Screens */
