@@ -68,14 +68,14 @@ const connectionOptions = isLocalMongoDB
     }
   : {
       // MongoDB Atlas options (optimized for cloud)
-      retryWrites: true,
-      w: 'majority',
+  retryWrites: true,
+  w: 'majority',
       maxPoolSize: 10,
       minPoolSize: 2,
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
       connectTimeoutMS: 10000,
-      heartbeatFrequencyMS: 10000
+  heartbeatFrequencyMS: 10000
     }
 
 mongoose.connect(MONGODB_URI, connectionOptions).then(() => {
