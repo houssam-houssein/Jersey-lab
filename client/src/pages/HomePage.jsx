@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Footer from '../components/Footer'
@@ -9,11 +9,31 @@ import paBg from '../assets/images/pa.png'
 import iBg from '../assets/images/i.png'
 import haBg from '../assets/images/ha.png'
 import twBg from '../assets/images/tw.png'
+import p1 from '../assets/images/p1.png'
+import p2 from '../assets/images/p2.png'
+import p3 from '../assets/images/p3.png'
+import p4 from '../assets/images/p4.png'
+import p5 from '../assets/images/p5.png'
+import p6 from '../assets/images/p6.png'
+import p7 from '../assets/images/p7.png'
+import p8 from '../assets/images/p8.png'
+import p9 from '../assets/images/p9.png'
+import p10 from '../assets/images/p10.png'
+import p11 from '../assets/images/p11.png'
+import p12 from '../assets/images/p12.png'
+import p13 from '../assets/images/p13.png'
 import './HomePage.css'
 
 const HomePage = () => {
   const location = useLocation()
   const { checkAuth } = useAuth()
+  
+  // Photo rotation state
+  const photos = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13]
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+  const [isPaused, setIsPaused] = useState(false)
 
   useEffect(() => {
     // Handle scrolling to sections when navigating from navbar
@@ -35,6 +55,93 @@ const HomePage = () => {
     }
   }, [location, checkAuth])
 
+  // Photo rotation effect
+  useEffect(() => {
+    if (isPaused) return
+    
+    const interval = setInterval(() => {
+      setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length)
+    }, 3000) // Change photo every 3 seconds
+
+    return () => clearInterval(interval)
+  }, [photos.length, isPaused])
+
+  // Swipe handlers
+  const minSwipeDistance = 50
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+    setIsPaused(true)
+  }
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) {
+      setIsPaused(false)
+      return
+    }
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe) {
+      setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length)
+    }
+    if (isRightSwipe) {
+      setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length)
+    }
+    
+    // Resume auto-rotation after a delay
+    setTimeout(() => setIsPaused(false), 3000)
+  }
+
+  // Mouse drag handlers for desktop
+  const [mouseStart, setMouseStart] = useState(null)
+  const [mouseEnd, setMouseEnd] = useState(null)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const onMouseDown = (e) => {
+    setMouseStart(e.clientX)
+    setIsDragging(true)
+    setIsPaused(true)
+  }
+
+  const onMouseMove = (e) => {
+    if (isDragging) {
+      setMouseEnd(e.clientX)
+    }
+  }
+
+  const onMouseUp = () => {
+    if (!mouseStart || !mouseEnd || !isDragging) {
+      setIsDragging(false)
+      setIsPaused(false)
+      return
+    }
+    
+    const distance = mouseStart - mouseEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe) {
+      setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length)
+    }
+    if (isRightSwipe) {
+      setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length)
+    }
+    
+    setIsDragging(false)
+    setMouseStart(null)
+    setMouseEnd(null)
+    // Resume auto-rotation after a delay
+    setTimeout(() => setIsPaused(false), 3000)
+  }
+
 
   return (
     <div className="homepage">
@@ -43,6 +150,57 @@ const HomePage = () => {
         <div className="main-logo">
           <img src={bgPoster} alt="JerseyLab Background" className="main-poster-bg" />
           <img src={logoPoster} alt="JerseyLab Logo" className="main-poster-logo" />
+        </div>
+      </div>
+      
+      {/* Rotating Photos Section */}
+      <div className="rotating-photos-section">
+        <div 
+          className="rotating-photos-container"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseUp}
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+        >
+          {photos.map((photo, index) => (
+            <img
+              key={index}
+              src={photo}
+              alt={`JerseyLab Gallery ${index + 1}`}
+              className={`rotating-photo ${index === currentPhotoIndex ? 'active' : ''}`}
+              draggable={false}
+            />
+          ))}
+          
+          {/* Navigation Dots - Only 3 dots in a line, rotates with photos */}
+          <div className="photo-navigation-dots">
+            {[
+              (currentPhotoIndex - 1 + photos.length) % photos.length, // Previous
+              currentPhotoIndex, // Current
+              (currentPhotoIndex + 1) % photos.length // Next
+            ].map((photoIndex, dotIndex) => (
+              <button
+                key={`${currentPhotoIndex}-${dotIndex}`}
+                className={`photo-dot ${dotIndex === 1 ? 'active' : ''}`}
+                onClick={() => {
+                  if (dotIndex === 0) {
+                    // Previous dot clicked
+                    setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length)
+                  } else if (dotIndex === 2) {
+                    // Next dot clicked
+                    setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length)
+                  }
+                  setIsPaused(true)
+                  setTimeout(() => setIsPaused(false), 3000)
+                }}
+                aria-label={dotIndex === 1 ? 'Current photo' : dotIndex === 0 ? 'Previous photo' : 'Next photo'}
+              />
+            ))}
+          </div>
         </div>
       </div>
       

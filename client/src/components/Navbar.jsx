@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
@@ -176,82 +177,85 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      <div 
-        className={`mobile-menu-overlay ${isMobileMenuOpen ? 'open' : ''}`}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            setIsMobileMenuOpen(false)
-          }
-        }}
-      >
-        <div className="mobile-menu-content">
-          <div className="mobile-nav-links">
-            <Link to="/professional-athletes" className="mobile-nav-link" onClick={handleLinkClick}>
-              PROFESSIONAL ATHLETES
-            </Link>
-            <Link to="/influencers" className="mobile-nav-link" onClick={handleLinkClick}>
-              INFLUENCERS
-            </Link>
-            <Link to="/high-school-athletes" className="mobile-nav-link" onClick={handleLinkClick}>
-              HIGH SCHOOL ATHLETES
-            </Link>
-            <Link to="/teamwear" className="mobile-nav-link" onClick={handleLinkClick}>
-              TEAMWEAR
-            </Link>
-            <a href="#about-us" className="mobile-nav-link" onClick={handleAboutUsClick}>
-              ABOUT
-            </a>
-            <Link to="/shipping-returns" className="mobile-nav-link" onClick={handleLinkClick}>
-              SHIPPING & RETURNS
-            </Link>
-            <Link to="/terms-conditions" className="mobile-nav-link" onClick={handleLinkClick}>
-              TERMS & CONDITIONS
-            </Link>
-          </div>
-          
-          {/* Mobile Login/User Menu */}
-          <div className="mobile-login-section">
-            {authenticated && user ? (
-              <div className="mobile-user-info">
-                <div className="mobile-user-details">
-                  {user.picture ? (
-                    <img 
-                      src={user.picture} 
-                      alt={user.name} 
-                      className="mobile-user-avatar"
-                      onError={(e) => {
-                        e.target.style.display = 'none'
-                      }}
-                    />
-                  ) : (
-                    <div className="mobile-user-avatar-fallback">
-                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                  )}
-                  <span className="mobile-user-name">{user.name}</span>
-                </div>
-                <button onClick={() => { handleLogout(); handleLinkClick(); }} className="mobile-logout-button">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                  </svg>
-                  <span>Logout</span>
-                </button>
-              </div>
-            ) : (
-              <Link to="/login" className="mobile-login-link" onClick={handleLinkClick}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>Log In</span>
+      {/* Mobile Menu Overlay - Rendered via Portal */}
+      {isMobileMenuOpen && createPortal(
+        <div 
+          className={`mobile-menu-overlay open`}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsMobileMenuOpen(false)
+            }
+          }}
+        >
+          <div className="mobile-menu-content">
+            <div className="mobile-nav-links">
+              <Link to="/professional-athletes" className="mobile-nav-link" onClick={handleLinkClick}>
+                PROFESSIONAL ATHLETES
               </Link>
-            )}
+              <Link to="/influencers" className="mobile-nav-link" onClick={handleLinkClick}>
+                INFLUENCERS
+              </Link>
+              <Link to="/high-school-athletes" className="mobile-nav-link" onClick={handleLinkClick}>
+                HIGH SCHOOL ATHLETES
+              </Link>
+              <Link to="/teamwear" className="mobile-nav-link" onClick={handleLinkClick}>
+                TEAMWEAR
+              </Link>
+              <a href="#about-us" className="mobile-nav-link" onClick={handleAboutUsClick}>
+                ABOUT
+              </a>
+              <Link to="/shipping-returns" className="mobile-nav-link" onClick={handleLinkClick}>
+                SHIPPING & RETURNS
+              </Link>
+              <Link to="/terms-conditions" className="mobile-nav-link" onClick={handleLinkClick}>
+                TERMS & CONDITIONS
+              </Link>
+            </div>
+            
+            {/* Mobile Login/User Menu */}
+            <div className="mobile-login-section">
+              {authenticated && user ? (
+                <div className="mobile-user-info">
+                  <div className="mobile-user-details">
+                    {user.picture ? (
+                      <img 
+                        src={user.picture} 
+                        alt={user.name} 
+                        className="mobile-user-avatar"
+                        onError={(e) => {
+                          e.target.style.display = 'none'
+                        }}
+                      />
+                    ) : (
+                      <div className="mobile-user-avatar-fallback">
+                        {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                    )}
+                    <span className="mobile-user-name">{user.name}</span>
+                  </div>
+                  <button onClick={() => { handleLogout(); handleLinkClick(); }} className="mobile-logout-button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              ) : (
+                <Link to="/login" className="mobile-login-link" onClick={handleLinkClick}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  <span>Log In</span>
+                </Link>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+        </div>,
+        document.body
+      )}
     </nav>
   )
 }

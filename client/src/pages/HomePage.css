@@ -36,8 +36,8 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 100vh;
-  min-height: 100vh;
+  height: 60vh;
+  min-height: 60vh;
   max-width: 100vw;
   margin: 0;
   padding: 0;
@@ -53,7 +53,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 100vh;
+  min-height: 60vh;
   max-width: 100vw;
   display: flex;
   flex-direction: column;
@@ -67,7 +67,7 @@
 .main-poster-bg {
   width: 100%;
   height: 100%;
-  min-height: 100vh;
+  min-height: 60vh;
   max-width: 100%;
   object-fit: cover;
   object-position: center center;
@@ -120,6 +120,82 @@
   60% {
     transform: translateY(-5px);
   }
+}
+
+/* Rotating Photos Section */
+.rotating-photos-section {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+  position: relative;
+  overflow: hidden;
+}
+
+.rotating-photos-container {
+  width: 100%;
+  height: 90vh;
+  min-height: 700px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rotating-photo {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  z-index: 1;
+}
+
+.rotating-photo.active {
+  opacity: 1;
+  z-index: 2;
+}
+
+/* Navigation Dots - Only 3 dots in a horizontal line */
+.photo-navigation-dots {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.photo-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.photo-dot:hover {
+  border-color: #bfff00;
+  background-color: rgba(191, 255, 0, 0.3);
+  transform: scale(1.2);
+}
+
+.photo-dot.active {
+  background-color: #bfff00;
+  border-color: #bfff00;
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 0 10px rgba(191, 255, 0, 0.5);
 }
 
 /* PA and Influencers Grid Container */
@@ -1030,8 +1106,8 @@
   
   .homepage-content {
     width: 100%;
-    height: 100vh;
-    min-height: 100vh;
+    height: 60vh;
+    min-height: 60vh;
     max-width: 100vw;
     overflow: hidden;
   }
@@ -1039,17 +1115,38 @@
   .main-logo {
     width: 100%;
     height: 100%;
-    min-height: 100vh;
+    min-height: 60vh;
     max-width: 100vw;
   }
   
   .main-poster-bg {
     width: 100%;
     height: 100%;
-    min-height: 100vh;
+    min-height: 60vh;
     max-width: 100%;
     object-fit: cover;
     object-position: center center;
+  }
+  
+  .rotating-photos-container {
+    height: 80vh;
+    min-height: 600px;
+  }
+  
+  .photo-navigation-dots {
+    bottom: 20px;
+    right: 20px;
+    gap: 10px;
+  }
+  
+  .photo-dot {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .photo-dot.active {
+    width: 12px;
+    height: 12px;
   }
   
   .main-poster-logo {
@@ -1139,8 +1236,8 @@
   
   .homepage-content {
     width: 100%;
-    height: calc(100vh - 70px);
-    min-height: calc(100vh - 70px);
+    height: 50vh;
+    min-height: 50vh;
     max-width: 100vw;
     padding: 0;
     position: relative;
@@ -1148,6 +1245,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  .rotating-photos-container {
+    height: 70vh;
+    min-height: 500px;
+  }
+  
+  .photo-navigation-dots {
+    bottom: 15px;
+    right: 15px;
+    gap: 8px;
+  }
+  
+  .photo-dot {
+    width: 9px;
+    height: 9px;
+  }
+  
+  .photo-dot.active {
+    width: 11px;
+    height: 11px;
   }
   
   .main-logo {
@@ -1316,14 +1434,19 @@
 @media (max-width: 480px) {
   .homepage-content {
     width: 100%;
-    height: calc(100vh - 60px);
-    min-height: calc(100vh - 60px);
+    height: 50vh;
+    min-height: 50vh;
     max-width: 100vw;
     position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  .rotating-photos-container {
+    height: 70vh;
+    min-height: 450px;
   }
   
   .main-logo {
@@ -1455,12 +1578,17 @@
 @media (max-width: 360px) {
   .homepage-content {
     width: 100%;
-    height: calc(100vh - 55px);
-    min-height: calc(100vh - 55px);
+    height: 50vh;
+    min-height: 50vh;
     max-width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  .rotating-photos-container {
+    height: 70vh;
+    min-height: 450px;
   }
   
   .main-logo {
@@ -1575,14 +1703,19 @@
 @media (max-height: 500px) and (orientation: landscape) {
   .homepage-content {
     width: 100%;
-    height: calc(100vh - 50px);
-    min-height: calc(100vh - 50px);
+    height: 50vh;
+    min-height: 50vh;
     max-width: 100vw;
     position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  .rotating-photos-container {
+    height: 70vh;
+    min-height: 450px;
   }
   
   .main-logo {

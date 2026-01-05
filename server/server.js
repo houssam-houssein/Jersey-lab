@@ -10,7 +10,7 @@ import Category from './models/Category.js'
 import TeamwearInquiry from './models/TeamwearInquiry.js'
 import User from './models/User.js'
 import PromoCode from './models/PromoCode.js'
-import { sendWelcomeEmail, verifyEmailConfig } from './utils/emailService.js'
+import { sendWelcomeEmail, sendTeamwearInquiryNotification, verifyEmailConfig } from './utils/emailService.js'
 
 dotenv.config()
 
@@ -372,6 +372,20 @@ app.post('/api/teamwear-inquiries', async (req, res) => {
       fileName: fileName || '',
       status: 'pending'
     })
+    
+    // Send email notification to owner
+    try {
+      const owner = await Admin.findOne({ role: 'owner' })
+      if (owner && owner.email) {
+        await sendTeamwearInquiryNotification(owner.email, inquiry)
+        console.log(`Teamwear inquiry notification sent to owner: ${owner.email}`)
+      } else {
+        console.warn('No owner found with email address. Skipping email notification.')
+      }
+    } catch (emailError) {
+      console.error('Failed to send teamwear inquiry notification email:', emailError)
+      // Don't fail the request if email fails
+    }
     
     res.status(201).json(inquiry)
   } catch (error) {
