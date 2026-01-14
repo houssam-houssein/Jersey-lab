@@ -311,7 +311,7 @@ const HomePage = () => {
               At JerseyLab, we believe jerseys are more than fabric. They're living stories of the game. Every player, from professional athletes to high school stars and basketball influencers, carries a legacy that deserves to be celebrated.
             </p>
             <p className="about-us-paragraph">
-              That's why we partner directly with players to design and release authentic, licensed jerseys. Each piece is backed by signed agreements, ensuring that what you wear is legit, respectful, and true to the player's journey. From the teams they've represented to the years they've shined, every jersey captures a chapter of basketball history.
+              That's why we partner directly with players to design and release authentic jerseys. From the teams they've represented to the years they've shined, every jersey captures a chapter of basketball history.
             </p>
             <p className="about-us-paragraph">
               Our mission is to:
