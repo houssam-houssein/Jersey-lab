@@ -30,10 +30,23 @@ const HomePage = () => {
   
   // Photo rotation state
   const photos = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13]
-  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
+  // Create infinite loop with 3 sets of photos for seamless scrolling
+  const infinitePhotos = [...photos, ...photos, ...photos]
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(photos.length) // Start in the middle set
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
   const [isPaused, setIsPaused] = useState(false)
+  const [swipeOffset, setSwipeOffset] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 968)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 968)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     // Handle scrolling to sections when navigating from navbar
@@ -60,7 +73,20 @@ const HomePage = () => {
     if (isPaused) return
     
     const interval = setInterval(() => {
-      setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length)
+      setIsAnimating(true)
+      setCurrentPhotoIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1
+        // If we're about to leave the middle set, jump back to equivalent position in middle set
+        if (nextIndex >= photos.length * 2) {
+          setTimeout(() => {
+            setIsAnimating(false)
+            setCurrentPhotoIndex(nextIndex - photos.length)
+          }, 600)
+          return nextIndex
+        }
+        setTimeout(() => setIsAnimating(false), 600)
+        return nextIndex
+      })
     }, 3000) // Change photo every 3 seconds
 
     return () => clearInterval(interval)
@@ -73,14 +99,23 @@ const HomePage = () => {
     setTouchEnd(null)
     setTouchStart(e.targetTouches[0].clientX)
     setIsPaused(true)
+    setSwipeOffset(0)
+    setIsAnimating(false)
   }
 
   const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX)
+    const currentX = e.targetTouches[0].clientX
+    setTouchEnd(currentX)
+    if (touchStart !== null) {
+      const offset = currentX - touchStart
+      setSwipeOffset(offset)
+      setIsAnimating(false)
+    }
   }
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) {
+      setSwipeOffset(0)
       setIsPaused(false)
       return
     }
@@ -90,12 +125,42 @@ const HomePage = () => {
     const isRightSwipe = distance < -minSwipeDistance
 
     if (isLeftSwipe) {
-      setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length)
-    }
-    if (isRightSwipe) {
-      setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length)
+      setIsAnimating(true)
+      setCurrentPhotoIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1
+        // If we're about to leave the middle set, jump back to equivalent position in middle set
+        if (nextIndex >= photos.length * 2) {
+          setTimeout(() => {
+            setIsAnimating(false)
+            setCurrentPhotoIndex(nextIndex - photos.length)
+          }, 600)
+          return nextIndex
+        }
+        setTimeout(() => setIsAnimating(false), 600)
+        return nextIndex
+      })
+    } else if (isRightSwipe) {
+      setIsAnimating(true)
+      setCurrentPhotoIndex((prevIndex) => {
+        const prevIndexValue = prevIndex - 1
+        // If we're about to leave the middle set, jump back to equivalent position in middle set
+        if (prevIndexValue < photos.length) {
+          setTimeout(() => {
+            setIsAnimating(false)
+            setCurrentPhotoIndex(prevIndexValue + photos.length)
+          }, 600)
+          return prevIndexValue
+        }
+        setTimeout(() => setIsAnimating(false), 600)
+        return prevIndexValue
+      })
+    } else {
+      setSwipeOffset(0)
+      setIsPaused(false)
+      return
     }
     
+    setSwipeOffset(0)
     // Resume auto-rotation after a delay
     setTimeout(() => setIsPaused(false), 3000)
   }
@@ -109,11 +174,17 @@ const HomePage = () => {
     setMouseStart(e.clientX)
     setIsDragging(true)
     setIsPaused(true)
+    setSwipeOffset(0)
+    setIsAnimating(false)
   }
 
   const onMouseMove = (e) => {
-    if (isDragging) {
-      setMouseEnd(e.clientX)
+    if (isDragging && mouseStart !== null) {
+      const currentX = e.clientX
+      setMouseEnd(currentX)
+      const offset = currentX - mouseStart
+      setSwipeOffset(offset)
+      setIsAnimating(false)
     }
   }
 
@@ -121,6 +192,7 @@ const HomePage = () => {
     if (!mouseStart || !mouseEnd || !isDragging) {
       setIsDragging(false)
       setIsPaused(false)
+      setSwipeOffset(0)
       return
     }
     
@@ -129,15 +201,48 @@ const HomePage = () => {
     const isRightSwipe = distance < -minSwipeDistance
 
     if (isLeftSwipe) {
-      setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length)
-    }
-    if (isRightSwipe) {
-      setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length)
+      setIsAnimating(true)
+      setCurrentPhotoIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1
+        // If we're about to leave the middle set, jump back to equivalent position in middle set
+        if (nextIndex >= photos.length * 2) {
+          setTimeout(() => {
+            setIsAnimating(false)
+            setCurrentPhotoIndex(nextIndex - photos.length)
+          }, 600)
+          return nextIndex
+        }
+        setTimeout(() => setIsAnimating(false), 600)
+        return nextIndex
+      })
+    } else if (isRightSwipe) {
+      setIsAnimating(true)
+      setCurrentPhotoIndex((prevIndex) => {
+        const prevIndexValue = prevIndex - 1
+        // If we're about to leave the middle set, jump back to equivalent position in middle set
+        if (prevIndexValue < photos.length) {
+          setTimeout(() => {
+            setIsAnimating(false)
+            setCurrentPhotoIndex(prevIndexValue + photos.length)
+          }, 600)
+          return prevIndexValue
+        }
+        setTimeout(() => setIsAnimating(false), 600)
+        return prevIndexValue
+      })
+    } else {
+      setIsDragging(false)
+      setMouseStart(null)
+      setMouseEnd(null)
+      setSwipeOffset(0)
+      setIsPaused(false)
+      return
     }
     
     setIsDragging(false)
     setMouseStart(null)
     setMouseEnd(null)
+    setSwipeOffset(0)
     // Resume auto-rotation after a delay
     setTimeout(() => setIsPaused(false), 3000)
   }
@@ -155,51 +260,85 @@ const HomePage = () => {
       
       {/* Rotating Photos Section */}
       <div className="rotating-photos-section">
-        <div 
-          className="rotating-photos-container"
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseUp}
-          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-        >
-          {photos.map((photo, index) => (
-            <img
-              key={index}
-              src={photo}
-              alt={`JerseyLab Gallery ${index + 1}`}
-              className={`rotating-photo ${index === currentPhotoIndex ? 'active' : ''}`}
-              draggable={false}
-            />
-          ))}
+        <div className="rotating-photos-container">
+          <div 
+            className="rotating-photos-carousel"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseUp}
+            style={{ 
+              cursor: isDragging ? 'grabbing' : 'grab',
+              transform: `translateX(calc(-${currentPhotoIndex * (isMobile ? 100 : 33.333)}% + ${swipeOffset}px))`,
+              transition: isAnimating && swipeOffset === 0 ? 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
+            }}
+          >
+            {infinitePhotos.map((photo, index) => (
+              <img
+                key={index}
+                src={photo}
+                alt={`JerseyLab Gallery ${(index % photos.length) + 1}`}
+                className="rotating-photo"
+                draggable={false}
+              />
+            ))}
+          </div>
           
           {/* Navigation Dots - Only 3 dots in a line, rotates with photos */}
           <div className="photo-navigation-dots">
             {[
-              (currentPhotoIndex - 1 + photos.length) % photos.length, // Previous
+              currentPhotoIndex - 1, // Previous
               currentPhotoIndex, // Current
-              (currentPhotoIndex + 1) % photos.length // Next
-            ].map((photoIndex, dotIndex) => (
-              <button
-                key={`${currentPhotoIndex}-${dotIndex}`}
-                className={`photo-dot ${dotIndex === 1 ? 'active' : ''}`}
-                onClick={() => {
-                  if (dotIndex === 0) {
-                    // Previous dot clicked
-                    setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length)
-                  } else if (dotIndex === 2) {
-                    // Next dot clicked
-                    setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length)
-                  }
-                  setIsPaused(true)
-                  setTimeout(() => setIsPaused(false), 3000)
-                }}
-                aria-label={dotIndex === 1 ? 'Current photo' : dotIndex === 0 ? 'Previous photo' : 'Next photo'}
-              />
-            ))}
+              currentPhotoIndex + 1 // Next
+            ].map((photoIndex, dotIndex) => {
+              // Map infinite index to real photo index (0-12)
+              const realIndex = ((photoIndex % photos.length) + photos.length) % photos.length
+              return (
+                <button
+                  key={`${currentPhotoIndex}-${dotIndex}`}
+                  className={`photo-dot ${dotIndex === 1 ? 'active' : ''}`}
+                  onClick={() => {
+                    setIsAnimating(true)
+                    if (dotIndex === 0) {
+                      // Previous dot clicked
+                      setCurrentPhotoIndex((prevIndex) => {
+                        const prevIndexValue = prevIndex - 1
+                        if (prevIndexValue < photos.length) {
+                          setTimeout(() => {
+                            setIsAnimating(false)
+                            setCurrentPhotoIndex(prevIndexValue + photos.length)
+                          }, 600)
+                          return prevIndexValue
+                        }
+                        setTimeout(() => setIsAnimating(false), 600)
+                        return prevIndexValue
+                      })
+                    } else if (dotIndex === 2) {
+                      // Next dot clicked
+                      setCurrentPhotoIndex((prevIndex) => {
+                        const nextIndex = prevIndex + 1
+                        if (nextIndex >= photos.length * 2) {
+                          setTimeout(() => {
+                            setIsAnimating(false)
+                            setCurrentPhotoIndex(nextIndex - photos.length)
+                          }, 600)
+                          return nextIndex
+                        }
+                        setTimeout(() => setIsAnimating(false), 600)
+                        return nextIndex
+                      })
+                    }
+                    setIsPaused(true)
+                    setTimeout(() => setIsAnimating(false), 600)
+                    setTimeout(() => setIsPaused(false), 3000)
+                  }}
+                  aria-label={dotIndex === 1 ? 'Current photo' : dotIndex === 0 ? 'Previous photo' : 'Next photo'}
+                />
+              )
+            })}
           </div>
         </div>
       </div>
