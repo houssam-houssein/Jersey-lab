@@ -12,9 +12,11 @@ import ProfessionalAthletesPage from './pages/ProfessionalAthletesPage'
 import InfluencersPage from './pages/InfluencersPage'
 import HighSchoolAthletesPage from './pages/HighSchoolAthletesPage'
 import CartPage from './pages/CartPage'
+import CheckoutPage from './pages/CheckoutPage'
 import TermsConditionsPage from './pages/TermsConditionsPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import AdminLoginPage from './pages/AdminLoginPage'
+import AdminResetPasswordPage from './pages/AdminResetPasswordPage'
 import './App.css'
 
 // Get basename for GitHub Pages
@@ -66,7 +68,7 @@ function getBasename() {
       if (pathMatch && pathMatch[1]) {
         const repoName = pathMatch[1]
         // Common routes to exclude from basename detection
-        const excludedRoutes = ['admin', 'admin-login', 'login', 'signup', 'cart', 'teamwear', 
+        const excludedRoutes = ['admin', 'admin-login', 'login', 'signup', 'cart', 'checkout', 'teamwear', 
           'professional-athletes', 'influencers', 'high-school-athletes', 
           'shipping-returns', 'terms-conditions', 'assets', 'static', 'index.html']
         
@@ -102,8 +104,10 @@ const AppContent = () => {
         <Route path="/influencers" element={<InfluencersPage />} />
         <Route path="/high-school-athletes" element={<HighSchoolAthletesPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/terms-conditions" element={<TermsConditionsPage />} />
         <Route path="/admin-login" element={<AdminLoginPage />} />
+        <Route path="/admin-reset-password" element={<AdminResetPasswordPage />} />
         <Route path="/admin" element={<AdminDashboardPage />} />
       </Routes>
     </div>

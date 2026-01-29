@@ -9,7 +9,9 @@ const adminSchema = new mongoose.Schema({
     type: String, 
     enum: ['owner', 'admin', 'manager', 'staff'],
     default: 'staff' 
-  }
+  },
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date }
 }, { timestamps: true })
 
 adminSchema.pre('save', async function (next) {

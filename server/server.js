@@ -10,12 +10,27 @@ import Category from './models/Category.js'
 import TeamwearInquiry from './models/TeamwearInquiry.js'
 import User from './models/User.js'
 import PromoCode from './models/PromoCode.js'
-import { sendWelcomeEmail, sendTeamwearInquiryNotification, verifyEmailConfig } from './utils/emailService.js'
+import Order from './models/Order.js'
+import { 
+  sendWelcomeEmail, 
+  sendTeamwearInquiryNotification, 
+  sendOrderNotificationToAdmins,
+  sendAdminPasswordResetEmail,
+  getAllAdminEmails,
+  verifyEmailConfig 
+} from './utils/emailService.js'
+import Stripe from 'stripe'
+import crypto from 'crypto'
 
 dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 5000
+
+// Initialize Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder_key_replace_with_real_key', {
+  apiVersion: '2024-12-18.acacia'
+})
 // Default to local MongoDB for development
 // To use MongoDB Atlas, set MONGODB_URI in .env file with your Atlas connection string
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/Jerseylab'
@@ -104,13 +119,15 @@ if (hasGoogleKeys) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback'
-  }, async (accessToken, refreshToken, profile, done) => {
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback',
+    passReqToCallback: true // Allow access to request object
+  }, async (req, accessToken, refreshToken, profile, done) => {
     try {
       const email = profile.emails[0].value
       const googleId = profile.id
       const name = profile.displayName
       const picture = profile.photos && profile.photos[0] ? profile.photos[0].value : null
+      const isSignupFlow = req.session?.isSignupFlow || false
 
       // Check if user exists in database
       let user = await User.findOne({ 
@@ -120,10 +137,12 @@ if (hasGoogleKeys) {
         ]
       })
 
-      // Simplified flow: Allow signup automatically
-      // If user doesn't exist, create them (signup)
-      // If user exists but hasn't signed up, complete signup
-      // If user exists and has signed up, regular login
+      // If this is a signup flow and user already exists, prevent duplicate signup
+      if (isSignupFlow && user && user.hasSignedUp) {
+        const error = new Error('Account already exists')
+        error.code = 'ACCOUNT_EXISTS'
+        return done(error, null)
+      }
       
       if (user) {
         // If user exists but hasn't signed up, complete signup
@@ -254,6 +273,85 @@ app.post('/api/admin/login', async (req, res) => {
   }
 })
 
+// Request password reset
+app.post('/api/admin/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' })
+    }
+
+    const admin = await Admin.findOne({ email: email.toLowerCase() })
+    
+    // Always return success to prevent email enumeration
+    if (!admin) {
+      return res.json({ 
+        message: 'If an admin account exists with this email, a password reset link has been sent.' 
+      })
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex')
+    const resetExpires = new Date(Date.now() + 3600000) // 1 hour from now
+
+    admin.resetPasswordToken = resetToken
+    admin.resetPasswordExpires = resetExpires
+    await admin.save()
+
+    // Send reset email
+    try {
+      await sendAdminPasswordResetEmail(admin.email, resetToken)
+      console.log(`Password reset email sent to admin: ${admin.email}`)
+    } catch (emailError) {
+      console.error('Failed to send password reset email:', emailError)
+      // Don't fail the request if email fails
+    }
+
+    res.json({ 
+      message: 'If an admin account exists with this email, a password reset link has been sent.' 
+    })
+  } catch (error) {
+    console.error('Password reset request error:', error)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+// Reset password with token
+app.post('/api/admin/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body
+    
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Token and new password are required' })
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long' })
+    }
+
+    const admin = await Admin.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    })
+
+    if (!admin) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' })
+    }
+
+    // Set new password (will be hashed by pre-save hook)
+    admin.password = newPassword
+    admin.resetPasswordToken = undefined
+    admin.resetPasswordExpires = undefined
+    await admin.save()
+
+    res.json({ message: 'Password has been reset successfully' })
+  } catch (error) {
+    console.error('Password reset error:', error)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
 // Simple in-memory cache for categories (5 minute TTL)
 const categoryCache = new Map()
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
@@ -373,14 +471,17 @@ app.post('/api/teamwear-inquiries', async (req, res) => {
       status: 'pending'
     })
     
-    // Send email notification to owner
+    // Send email notification to all admins
     try {
-      const owner = await Admin.findOne({ role: 'owner' })
-      if (owner && owner.email) {
-        await sendTeamwearInquiryNotification(owner.email, inquiry)
-        console.log(`Teamwear inquiry notification sent to owner: ${owner.email}`)
+      const adminEmails = await getAllAdminEmails(Admin)
+      if (adminEmails.length > 0) {
+        // Send to all admins
+        for (const adminEmail of adminEmails) {
+          await sendTeamwearInquiryNotification(adminEmail, inquiry)
+        }
+        console.log(`Teamwear inquiry notification sent to ${adminEmails.length} admin(s)`)
       } else {
-        console.warn('No owner found with email address. Skipping email notification.')
+        console.warn('No admin emails found for teamwear inquiry notification')
       }
     } catch (emailError) {
       console.error('Failed to send teamwear inquiry notification email:', emailError)
@@ -591,6 +692,12 @@ if (hasGoogleKeys) {
           if (req.session) {
             req.session.isSignupFlow = false
           }
+          
+          // Check if error is due to account already existing
+          if (err.code === 'ACCOUNT_EXISTS') {
+            return res.redirect(process.env.CLIENT_URL + '/signup?error=account_exists')
+          }
+          
           return res.redirect(process.env.CLIENT_URL + '/login?error=auth_failed')
         }
         if (!user) {
@@ -824,6 +931,237 @@ app.post('/api/auth/logout', (req, res) => {
     }
     res.json({ message: 'Logged out successfully' })
   })
+})
+
+//  PAYMENT ENDPOINTS 
+
+// Create Payment Intent
+app.post('/api/payments/create-intent', async (req, res) => {
+  try {
+    const { items, shippingAddress, subtotal, discount, promoCode, shipping, tax, total, userId, email } = req.body
+
+    // Validate required fields
+    if (!items || items.length === 0) {
+      return res.status(400).json({ error: 'Cart items are required' })
+    }
+    if (!shippingAddress) {
+      return res.status(400).json({ error: 'Shipping address is required' })
+    }
+    if (total <= 0) {
+      return res.status(400).json({ error: 'Total must be greater than 0' })
+    }
+
+    // Create payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(total * 100), // Convert to cents
+      currency: 'usd',
+      metadata: {
+        userId: userId || 'guest',
+        email: email,
+        itemCount: items.length.toString(),
+        promoCode: promoCode || 'none'
+      },
+      automatic_payment_methods: {
+        enabled: true
+      }
+    })
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
+    })
+  } catch (error) {
+    console.error('Failed to create payment intent:', error)
+    res.status(500).json({ error: 'Failed to create payment intent', details: error.message })
+  }
+})
+
+// Create Order (after successful payment)
+app.post('/api/orders', async (req, res) => {
+  try {
+    const { 
+      paymentIntentId, 
+      items, 
+      shippingAddress, 
+      subtotal, 
+      discount, 
+      promoCode, 
+      shipping, 
+      tax, 
+      total, 
+      userId, 
+      email,
+      stripeCustomerId 
+    } = req.body
+
+    // Validate payment intent
+    if (!paymentIntentId) {
+      return res.status(400).json({ error: 'Payment intent ID is required' })
+    }
+
+    // Verify payment intent with Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
+    
+    if (paymentIntent.status !== 'succeeded') {
+      return res.status(400).json({ error: 'Payment has not been completed' })
+    }
+
+    // Check if order already exists
+    const existingOrder = await Order.findOne({ paymentIntentId })
+    if (existingOrder) {
+      return res.json({ order: existingOrder, message: 'Order already exists' })
+    }
+
+    // Create order
+    const order = new Order({
+      userId: userId || null,
+      email,
+      items,
+      shippingAddress,
+      subtotal,
+      discount,
+      promoCode,
+      shipping,
+      tax,
+      total,
+      paymentIntentId,
+      paymentStatus: 'succeeded',
+      orderStatus: 'confirmed',
+      stripeCustomerId
+    })
+
+    await order.save()
+
+    // Send email notification to all admins
+    try {
+      const adminEmails = await getAllAdminEmails(Admin)
+      if (adminEmails.length > 0) {
+        await sendOrderNotificationToAdmins(adminEmails, order)
+        console.log(`Order notification sent to ${adminEmails.length} admin(s)`)
+      } else {
+        console.warn('No admin emails found for order notification')
+      }
+    } catch (emailError) {
+      console.error('Failed to send order notification email:', emailError)
+      // Don't fail the order creation if email fails
+    }
+
+    res.status(201).json({ 
+      order,
+      message: 'Order created successfully' 
+    })
+  } catch (error) {
+    console.error('Failed to create order:', error)
+    res.status(500).json({ error: 'Failed to create order', details: error.message })
+  }
+})
+
+// Get user orders
+app.get('/api/orders', async (req, res) => {
+  try {
+    const userId = req.user?.id
+    const email = req.query.email
+
+    if (!userId && !email) {
+      return res.status(400).json({ error: 'User ID or email is required' })
+    }
+
+    const query = userId ? { userId } : { email }
+    const orders = await Order.find(query).sort({ createdAt: -1 })
+
+    res.json({ orders })
+  } catch (error) {
+    console.error('Failed to fetch orders:', error)
+    res.status(500).json({ error: 'Failed to fetch orders' })
+  }
+})
+
+// Get single order
+app.get('/api/orders/:orderNumber', async (req, res) => {
+  try {
+    const { orderNumber } = req.params
+    const order = await Order.findOne({ orderNumber })
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' })
+    }
+
+    res.json({ order })
+  } catch (error) {
+    console.error('Failed to fetch order:', error)
+    res.status(500).json({ error: 'Failed to fetch order' })
+  }
+})
+
+// Stripe Webhook Handler
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature']
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_placeholder_secret_replace_with_real_secret'
+
+  let event
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret)
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message)
+    return res.status(400).send(`Webhook Error: ${err.message}`)
+  }
+
+  // Handle the event
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object
+      console.log('PaymentIntent succeeded:', paymentIntent.id)
+      
+      // Update order payment status if order exists
+      try {
+        const order = await Order.findOne({ paymentIntentId: paymentIntent.id })
+        if (order) {
+          const wasAlreadyConfirmed = order.orderStatus === 'confirmed'
+          order.paymentStatus = 'succeeded'
+          order.orderStatus = 'confirmed'
+          await order.save()
+          console.log('Order updated:', order.orderNumber)
+          
+          // Send email notification to all admins only if order was just confirmed (not already confirmed)
+          if (!wasAlreadyConfirmed) {
+            try {
+              const adminEmails = await getAllAdminEmails(Admin)
+              if (adminEmails.length > 0) {
+                await sendOrderNotificationToAdmins(adminEmails, order)
+                console.log(`Order notification sent to ${adminEmails.length} admin(s) via webhook`)
+              }
+            } catch (emailError) {
+              console.error('Failed to send order notification email via webhook:', emailError)
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to update order:', error)
+      }
+      break
+
+    case 'payment_intent.payment_failed':
+      const failedPayment = event.data.object
+      console.log('PaymentIntent failed:', failedPayment.id)
+      
+      // Update order payment status if order exists
+      try {
+        const order = await Order.findOne({ paymentIntentId: failedPayment.id })
+        if (order) {
+          order.paymentStatus = 'failed'
+          await order.save()
+        }
+      } catch (error) {
+        console.error('Failed to update order:', error)
+      }
+      break
+
+    default:
+      console.log(`Unhandled event type ${event.type}`)
+  }
+
+  res.json({ received: true })
 })
 
 // Start server

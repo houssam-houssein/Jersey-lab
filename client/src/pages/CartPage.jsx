@@ -87,14 +87,16 @@ const CartPage = () => {
       }, 3000)
       return
     }
-    setShowSuccessMessage(true)
-    clearCart()
-    // Scroll to top to show the message
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    // Navigate to homepage after 3 seconds
-    setTimeout(() => {
-      navigate('/')
-    }, 3000)
+    // Navigate to checkout with cart data
+    navigate('/checkout', {
+      state: {
+        subtotal: getCartTotal(),
+        discount: getDiscountAmount(),
+        promoCode: appliedPromo?.code || null,
+        shipping: 0, // Calculate shipping later
+        tax: 0 // Calculate tax later
+      }
+    })
   }
 
   return (

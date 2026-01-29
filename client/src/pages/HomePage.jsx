@@ -261,30 +261,30 @@ const HomePage = () => {
       {/* Rotating Photos Section */}
       <div className="rotating-photos-section">
         <div className="rotating-photos-container">
-          <div 
+        <div 
             className="rotating-photos-carousel"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-            onMouseDown={onMouseDown}
-            onMouseMove={onMouseMove}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseUp}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseUp}
             style={{ 
               cursor: isDragging ? 'grabbing' : 'grab',
               transform: `translateX(calc(-${currentPhotoIndex * (isMobile ? 100 : 33.333)}% + ${swipeOffset}px))`,
               transition: isAnimating && swipeOffset === 0 ? 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
             }}
-          >
+        >
             {infinitePhotos.map((photo, index) => (
-              <img
-                key={index}
-                src={photo}
+            <img
+              key={index}
+              src={photo}
                 alt={`JerseyLab Gallery ${(index % photos.length) + 1}`}
                 className="rotating-photo"
-                draggable={false}
-              />
-            ))}
+              draggable={false}
+            />
+          ))}
           </div>
           
           {/* Navigation Dots - Only 3 dots in a line, rotates with photos */}
@@ -297,13 +297,13 @@ const HomePage = () => {
               // Map infinite index to real photo index (0-12)
               const realIndex = ((photoIndex % photos.length) + photos.length) % photos.length
               return (
-                <button
-                  key={`${currentPhotoIndex}-${dotIndex}`}
-                  className={`photo-dot ${dotIndex === 1 ? 'active' : ''}`}
-                  onClick={() => {
+              <button
+                key={`${currentPhotoIndex}-${dotIndex}`}
+                className={`photo-dot ${dotIndex === 1 ? 'active' : ''}`}
+                onClick={() => {
                     setIsAnimating(true)
-                    if (dotIndex === 0) {
-                      // Previous dot clicked
+                  if (dotIndex === 0) {
+                    // Previous dot clicked
                       setCurrentPhotoIndex((prevIndex) => {
                         const prevIndexValue = prevIndex - 1
                         if (prevIndexValue < photos.length) {
@@ -316,8 +316,8 @@ const HomePage = () => {
                         setTimeout(() => setIsAnimating(false), 600)
                         return prevIndexValue
                       })
-                    } else if (dotIndex === 2) {
-                      // Next dot clicked
+                  } else if (dotIndex === 2) {
+                    // Next dot clicked
                       setCurrentPhotoIndex((prevIndex) => {
                         const nextIndex = prevIndex + 1
                         if (nextIndex >= photos.length * 2) {
@@ -330,13 +330,13 @@ const HomePage = () => {
                         setTimeout(() => setIsAnimating(false), 600)
                         return nextIndex
                       })
-                    }
-                    setIsPaused(true)
+                  }
+                  setIsPaused(true)
                     setTimeout(() => setIsAnimating(false), 600)
-                    setTimeout(() => setIsPaused(false), 3000)
-                  }}
-                  aria-label={dotIndex === 1 ? 'Current photo' : dotIndex === 0 ? 'Previous photo' : 'Next photo'}
-                />
+                  setTimeout(() => setIsPaused(false), 3000)
+                }}
+                aria-label={dotIndex === 1 ? 'Current photo' : dotIndex === 0 ? 'Previous photo' : 'Next photo'}
+              />
               )
             })}
           </div>

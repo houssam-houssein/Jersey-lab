@@ -18,11 +18,18 @@ const SignUpPage = () => {
   
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
-  // Check for success message from URL params (e.g., after Google OAuth)
+  // Check for success/error message from URL params (e.g., after Google OAuth)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     if (urlParams.get('signup') === 'success') {
       setMessage({ type: 'success', text: 'Signup successful! You can now log in with Google.' })
+      // Clear URL params
+      window.history.replaceState({}, '', window.location.pathname)
+    } else if (urlParams.get('error') === 'account_exists') {
+      setMessage({ 
+        type: 'error', 
+        text: 'An account with this email already exists. Please log in instead or use a different email address.' 
+      })
       // Clear URL params
       window.history.replaceState({}, '', window.location.pathname)
     }

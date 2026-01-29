@@ -85,20 +85,45 @@ const AdminLoginPage = () => {
     }
   }
 
-  const handleForgotPassword = (e) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault()
     if (!forgotEmail) {
-      setStatusMessage('Enter your email to receive reset instructions.')
+      setStatusType('error')
+      setStatusMessage('Please enter your email address.')
       return
     }
 
+    setIsLoading(true)
+    setStatusType('info')
     setStatusMessage('Sending reset instructions...')
 
-    setTimeout(() => {
-      setStatusMessage('Reset link sent. Check your inbox for next steps.')
+    try {
+      const response = await fetch(`${API_URL}/api/admin/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail }),
+        credentials: 'include'
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send reset email')
+      }
+
+      setStatusType('success')
+      setStatusMessage('If an admin account exists with this email, a password reset link has been sent. Check your inbox.')
       setForgotEmail('')
-      setShowForgotPassword(false)
-    }, 1200)
+      setTimeout(() => {
+        setShowForgotPassword(false)
+      }, 3000)
+    } catch (error) {
+      console.error('Forgot password error:', error)
+      setStatusType('error')
+      setStatusMessage(error.message || 'An error occurred. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
