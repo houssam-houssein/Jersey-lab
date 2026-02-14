@@ -9,8 +9,9 @@ const TeamwearPage = () => {
     phoneNumber: '',
     email: '',
     description: '',
-    designFile: null
+    designFiles: []
   })
+  const [filePreviews, setFilePreviews] = useState([])
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const fileInputRef = useRef(null)
@@ -20,11 +21,40 @@ const TeamwearPage = () => {
     const { name, value, files, type } = e.target
 
     if (type === 'file') {
-      const file = files && files[0] ? files[0] : null
-      setFormData(prev => ({
-        ...prev,
-        [name]: file
-      }))
+      if (files && files.length > 0) {
+        const newFiles = Array.from(files).slice(0, 5 - formData.designFiles.length) // Limit to 5 total
+        const updatedFiles = [...formData.designFiles, ...newFiles].slice(0, 5) // Ensure max 5
+        
+        // Create previews for all files
+        const createPreviews = async () => {
+          const previews = []
+          for (const file of updatedFiles) {
+            if (file.type && file.type.startsWith('image/')) {
+              try {
+                const preview = await new Promise((resolve, reject) => {
+                  const reader = new FileReader()
+                  reader.onload = () => resolve(reader.result)
+                  reader.onerror = reject
+                  reader.readAsDataURL(file)
+                })
+                previews.push({ file, preview })
+              } catch (error) {
+                previews.push({ file, preview: null })
+              }
+            } else {
+              previews.push({ file, preview: null })
+            }
+          }
+          setFilePreviews(previews)
+        }
+        
+        setFormData(prev => ({
+          ...prev,
+          [name]: updatedFiles
+        }))
+        
+        createPreviews()
+      }
       return
     }
 
@@ -34,23 +64,42 @@ const TeamwearPage = () => {
     }))
   }
 
+  const removeFile = (index) => {
+    const updatedFiles = formData.designFiles.filter((_, i) => i !== index)
+    const updatedPreviews = filePreviews.filter((_, i) => i !== index)
+    setFormData(prev => ({
+      ...prev,
+      designFiles: updatedFiles
+    }))
+    setFilePreviews(updatedPreviews)
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
     
     try {
-      // Convert file to base64 if present
-      let designFileBase64 = ''
-      let fileName = ''
+      // Convert files to base64 array
+      const designFilesData = []
       
-      if (formData.designFile) {
-        const reader = new FileReader()
-        designFileBase64 = await new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result)
-          reader.onerror = reject
-          reader.readAsDataURL(formData.designFile)
-        })
-        fileName = formData.designFile.name
+      if (formData.designFiles && formData.designFiles.length > 0) {
+        for (const file of formData.designFiles) {
+          const reader = new FileReader()
+          const base64 = await new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result)
+            reader.onerror = reject
+            reader.readAsDataURL(file)
+          })
+          designFilesData.push({
+            file: base64,
+            fileName: file.name,
+            fileType: file.type
+          })
+        }
       }
       
       const response = await fetch(`${API_URL}/api/teamwear-inquiries`, {
@@ -62,8 +111,7 @@ const TeamwearPage = () => {
           phoneNumber: formData.phoneNumber,
           email: formData.email,
           description: formData.description,
-          designFile: designFileBase64,
-          fileName: fileName
+          designFiles: designFilesData
         })
       })
       
@@ -78,8 +126,9 @@ const TeamwearPage = () => {
         phoneNumber: '',
         email: '',
         description: '',
-        designFile: null
+        designFiles: []
       })
+      setFilePreviews([])
       
       // Reset file input
       if (fileInputRef.current) {
@@ -216,21 +265,62 @@ const TeamwearPage = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="designFile" className="form-label">Upload Reference Image (optional)</label>
+          <label htmlFor="designFiles" className="form-label">
+            Upload Reference Photos (optional, up to 5)
+          </label>
           <input
             type="file"
-            id="designFile"
-            name="designFile"
+            id="designFiles"
+            name="designFiles"
             accept="image/*"
+            multiple
             onChange={handleChange}
             className="form-file-input"
             ref={fileInputRef}
+            disabled={formData.designFiles.length >= 5}
           />
           <p className="form-help-text">
-            Accepted formats: JPG, PNG, GIF. Max size 10MB.
+            Accepted formats: JPG, PNG, GIF. Max size 10MB per file. You can upload up to 5 photos.
+            {formData.designFiles.length > 0 && ` (${formData.designFiles.length}/5 uploaded)`}
           </p>
-          {formData.designFile && (
-            <p className="file-selected-name">Selected: {formData.designFile.name}</p>
+          
+          {/* File Previews */}
+          {filePreviews.length > 0 && (
+            <div className="file-previews-container">
+              {filePreviews.map((preview, index) => (
+                <div key={index} className="file-preview-item">
+                  {preview.preview ? (
+                    <img 
+                      src={preview.preview} 
+                      alt={`Preview ${index + 1}`}
+                      className="file-preview-image"
+                    />
+                  ) : (
+                    <div className="file-preview-placeholder">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                    </div>
+                  )}
+                  <div className="file-preview-info">
+                    <p className="file-preview-name">{preview.file.name}</p>
+                    <button
+                      type="button"
+                      className="file-preview-remove"
+                      onClick={() => removeFile(index)}
+                      aria-label={`Remove ${preview.file.name}`}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 

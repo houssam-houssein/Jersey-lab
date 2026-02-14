@@ -90,6 +90,7 @@ const AdminDashboardPage = () => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
   const [serverCategories, setServerCategories] = useState([])
   const [teamwearInquiries, setTeamwearInquiries] = useState([])
+  const [selectedImage, setSelectedImage] = useState(null)
   const [loadingInquiries, setLoadingInquiries] = useState(true)
   const [users, setUsers] = useState([])
   const [loadingUsers, setLoadingUsers] = useState(true)
@@ -116,6 +117,13 @@ const AdminDashboardPage = () => {
     isActive: true
   })
 
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('isAdminAuthenticated')
+    localStorage.removeItem('adminUser')
+    navigate('/admin-login', { replace: true })
+  }
+
   useEffect(() => {
     // Small delay to ensure localStorage is set after login redirect
     const checkAuth = setTimeout(() => {
@@ -127,6 +135,33 @@ const AdminDashboardPage = () => {
     
     return () => clearTimeout(checkAuth)
   }, [navigate])
+
+  // Auto-logout when page is closed or tab is hidden
+  useEffect(() => {
+    const clearAuth = () => {
+      // Clear admin authentication when closing the page
+      localStorage.removeItem('isAdminAuthenticated')
+      localStorage.removeItem('adminUser')
+    }
+
+    const handleBeforeUnload = () => {
+      clearAuth()
+    }
+
+    const handlePageHide = () => {
+      // More reliable than beforeunload, especially on mobile
+      clearAuth()
+    }
+
+    // Listen for page unload events
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('pagehide', handlePageHide)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('pagehide', handlePageHide)
+    }
+  }, [])
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -1030,10 +1065,39 @@ const AdminDashboardPage = () => {
                     </div>
                     <div className='inquiry-body'>
                       <p className='inquiry-description'>{inquiry.description}</p>
-                      {inquiry.designFile && (
+                      
+                      {/* New format: Multiple photos */}
+                      {inquiry.designFiles && inquiry.designFiles.length > 0 && (
+                        <div className='inquiry-images-container'>
+                          <p className='inquiry-image-label'>Reference Photos ({inquiry.designFiles.length}):</p>
+                          <div className='inquiry-images-grid'>
+                            {inquiry.designFiles.map((file, index) => (
+                              <div key={index} className='inquiry-image-item'>
+                                <img 
+                                  src={file.file} 
+                                  alt={`Reference ${index + 1}: ${file.fileName}`}
+                                  className='inquiry-image-preview'
+                                  onClick={() => setSelectedImage(file.file)}
+                                  style={{ cursor: 'pointer' }}
+                                />
+                                <p className='inquiry-image-name'>{file.fileName}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Legacy format: Single photo */}
+                      {(!inquiry.designFiles || inquiry.designFiles.length === 0) && inquiry.designFile && (
                         <div className='inquiry-image'>
                           <p className='inquiry-image-label'>Reference Image: {inquiry.fileName || 'uploaded-image'}</p>
-                          <img src={inquiry.designFile} alt='Design reference' className='inquiry-image-preview' />
+                          <img 
+                            src={inquiry.designFile} 
+                            alt='Design reference' 
+                            className='inquiry-image-preview'
+                            onClick={() => setSelectedImage(inquiry.designFile)}
+                            style={{ cursor: 'pointer' }}
+                          />
                         </div>
                       )}
                     </div>
@@ -1262,10 +1326,7 @@ const AdminDashboardPage = () => {
           </button>
           <button
             className='secondary-button'
-            onClick={() => {
-              localStorage.removeItem('isAdminAuthenticated')
-              navigate('/admin-login')
-            }}
+            onClick={handleLogout}
           >
             Logout
           </button>
@@ -1342,6 +1403,32 @@ const AdminDashboardPage = () => {
           {renderContent()}
         </main>
       </div>
+      
+      {/* Image Modal */}
+      {selectedImage && (
+        <div 
+          className='image-modal-overlay'
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className='image-modal-content' onClick={(e) => e.stopPropagation()}>
+            <button 
+              className='image-modal-close'
+              onClick={() => setSelectedImage(null)}
+              aria-label='Close image'
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+            <img 
+              src={selectedImage} 
+              alt='Full size reference'
+              className='image-modal-image'
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

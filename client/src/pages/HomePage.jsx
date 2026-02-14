@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Footer from '../components/Footer'
+import logo from '../assets/images/logo.png'
 import bgPoster from '../assets/images/bg-poster.png'
-import logoPoster from '../assets/images/logo-poster.png'
 import aboutBg from '../assets/images/about-bg.png'
 import paBg from '../assets/images/pa.png'
 import iBg from '../assets/images/i.png'
@@ -39,14 +39,46 @@ const HomePage = () => {
   const [swipeOffset, setSwipeOffset] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 968)
+  const carouselRef = useRef(null)
+  const [photoStep, setPhotoStep] = useState(0)
+  const [mobilePhotoWidth, setMobilePhotoWidth] = useState(0)
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 968)
+    const calculatePhotoStep = () => {
+      if (!carouselRef.current) {
+        setPhotoStep(0)
+        setMobilePhotoWidth(0)
+        return
+      }
+      
+      const carousel = carouselRef.current
+      const carouselWidth = carousel.offsetWidth
+      
+      if (window.innerWidth <= 968) {
+        // Mobile: photo width = container width (100%)
+        setMobilePhotoWidth(carouselWidth)
+        setPhotoStep(0)
+      } else {
+        // Desktop: Carousel has 10px gap between photos
+        // Photo width = (carouselWidth - 20px) / 3 (20px = 2 gaps of 10px each)
+        // Step = photo width + gap = (carouselWidth - 20px) / 3 + 10px
+        const step = (carouselWidth - 20) / 3 + 10
+        setPhotoStep(step)
+        setMobilePhotoWidth(0)
+      }
     }
+    
+    const handleResize = () => {
+      const wasMobile = isMobile
+      setIsMobile(window.innerWidth <= 968)
+      calculatePhotoStep()
+    }
+    
     window.addEventListener('resize', handleResize)
+    calculatePhotoStep() // Initial calculation
+    
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  }, [isMobile])
 
   useEffect(() => {
     // Handle scrolling to sections when navigating from navbar
@@ -253,8 +285,8 @@ const HomePage = () => {
       <div className="homepage-content">
         {/* Main Poster */}
         <div className="main-logo">
-          <img src={bgPoster} alt="JerseyLab Background" className="main-poster-bg" />
-          <img src={logoPoster} alt="JerseyLab Logo" className="main-poster-logo" />
+          <img src={bgPoster} alt="JerzeyLab Background" className="main-poster-bg" />
+          <img src={logo} alt="JerzeyLab Logo" className="main-poster-logo" />
         </div>
       </div>
       
@@ -262,6 +294,7 @@ const HomePage = () => {
       <div className="rotating-photos-section">
         <div className="rotating-photos-container">
         <div 
+            ref={carouselRef}
             className="rotating-photos-carousel"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
@@ -272,7 +305,13 @@ const HomePage = () => {
           onMouseLeave={onMouseUp}
             style={{ 
               cursor: isDragging ? 'grabbing' : 'grab',
-              transform: `translateX(calc(-${currentPhotoIndex * (isMobile ? 100 : 33.333)}% + ${swipeOffset}px))`,
+              transform: isMobile 
+                ? mobilePhotoWidth > 0
+                  ? `translateX(calc(-${currentPhotoIndex * mobilePhotoWidth}px + ${swipeOffset}px))`
+                  : `translateX(calc(-${currentPhotoIndex * 100}% + ${swipeOffset}px))`
+                : photoStep > 0
+                  ? `translateX(calc(-${currentPhotoIndex * photoStep}px + ${swipeOffset}px))`
+                  : `translateX(calc(-${currentPhotoIndex * 33.333}% + ${swipeOffset}px))`,
               transition: isAnimating && swipeOffset === 0 ? 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
             }}
         >
@@ -280,7 +319,7 @@ const HomePage = () => {
             <img
               key={index}
               src={photo}
-                alt={`JerseyLab Gallery ${(index % photos.length) + 1}`}
+                alt={`JerzeyLab Gallery ${(index % photos.length) + 1}`}
                 className="rotating-photo"
               draggable={false}
             />
@@ -358,7 +397,7 @@ const HomePage = () => {
               className="pa-category-link"
             >
               <h2 className="pa-category-title">PROFESSIONAL ATHLETES</h2>
-              <p className="pa-category-description">Browse your favorite overseas professional's international jersey</p>
+              <p className="pa-category-description">Browse your favorite overseas professional's international jerzey</p>
                 <Link to="/professional-athletes" className="pa-shop-now-button">
                   SHOP NOW →
                 </Link>
@@ -444,24 +483,24 @@ const HomePage = () => {
         style={{ backgroundImage: `url(${aboutBg})` }}
       >
         <div className="about-us-content">
-          <h2 className="about-us-title">JerseyLab</h2>
+          <h2 className="about-us-title">JerzeyLab</h2>
           <div className="about-us-text">
             <p className="about-us-paragraph">
-              At JerseyLab, we believe jerseys are more than fabric. They're living stories of the game. Every player, from professional athletes to high school stars and basketball influencers, carries a legacy that deserves to be celebrated.
+              At JerzeyLab, jerseys are more than fabric — they're living stories of the game. Every player, from professional athletes to high school standouts and basketball creators, carries a legacy worth celebrating.
             </p>
             <p className="about-us-paragraph">
-              That's why we partner directly with players to design and release authentic jerseys. From the teams they've represented to the years they've shined, every jersey captures a chapter of basketball history.
+              That's why we partner directly with players to design and release authentic, story-driven jerseys. From the teams they represent to the years they've shined, every piece captures a real chapter of their basketball history.
             </p>
             <p className="about-us-paragraph">
               Our mission is to:
             </p>
             <ul className="about-us-mission-list">
               <li>Empower players by giving them ownership of their brand and story</li>
-              <li>Connect fans with exclusive, collectible jerseys that honor real moments</li>
-              <li>Celebrate the culture of basketball at every level — pro, local, and digital</li>
+              <li>Connect fans with exclusive, collectible jerseys tied to real moments</li>
+              <li>Celebrate basketball culture at every level — from the biggest stages to the next wave</li>
             </ul>
             <p className="about-us-paragraph">
-              JerseyLab isn't just a store. It's a movement where fans, players, and communities come together to keep the spirit of the game alive.
+              JerzeyLab isn't just a store. It's a movement — bringing players, fans, and communities together to preserve the spirit, history, and future of the game.
             </p>
           </div>
         </div>

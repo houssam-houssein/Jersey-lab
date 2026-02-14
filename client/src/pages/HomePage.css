@@ -84,15 +84,15 @@
 .main-poster-logo {
   width: 100%;
   height: auto;
-  max-width: 105%;
-  max-height: 105vh;
+  max-width: 70%;
+  max-height: 70vh;
   object-fit: contain;
   object-position: center center;
   display: block;
   position: relative;
   z-index: 2;
   margin: auto;
-  margin-top: -3vh;
+  margin-top: 5vh;
 }
 
 
@@ -122,6 +122,7 @@
   background-color: #000000;
   position: relative;
   overflow: hidden;
+  overflow-x: hidden; /* Strictly hide horizontal overflow */
   border-top: none;
   border-bottom: none;
 }
@@ -132,6 +133,7 @@
   min-height: 700px;
   position: relative;
   overflow: hidden;
+  overflow-x: hidden; /* Strictly hide horizontal overflow */
 }
 
 .rotating-photos-carousel {
@@ -152,26 +154,68 @@
   outline: none;
 }
 
-/* Desktop: Show 3 photos side by side */
+/* Desktop: Show 3 complete photos side by side */
 @media (min-width: 969px) {
+  .rotating-photos-container {
+    overflow: hidden; /* Hide overflow for carousel effect */
+    padding: 0 10px; /* Minimal padding */
+  }
+  
   .rotating-photos-carousel {
-    gap: 20px;
-    padding: 0 40px;
+    gap: 10px; /* Reduced gap between photos */
+    padding: 0;
+    width: 100%;
   }
   
   .rotating-photo {
-    width: calc(33.333% - 14px);
+    width: calc((100% - 20px) / 3); /* Account for 2 gaps (10px each) between 3 photos */
+    min-width: calc((100% - 20px) / 3);
+    max-width: calc((100% - 20px) / 3);
+    aspect-ratio: 3 / 4; /* Consistent aspect ratio for all photos */
+    height: auto;
+    object-fit: cover; /* Fill the space, cropping square photos to match others */
+    object-position: center center; /* Center the image when cropping */
+    flex-shrink: 0;
   }
 }
 
 /* Mobile: Show single photo */
 @media (max-width: 968px) {
-  .rotating-photos-carousel {
+  .rotating-photos-section {
+    overflow: hidden;
+    overflow-x: hidden; /* Strictly hide horizontal overflow */
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+  }
+  
+  .rotating-photos-container {
+    overflow: hidden; /* Hide side photos */
+    overflow-x: hidden; /* Strictly hide horizontal overflow */
+    width: 100%;
+    max-width: 100vw; /* Match screen max-width */
+    position: relative;
+    margin: 0;
     padding: 0;
   }
   
-  .rotating-photo {
+  .rotating-photos-carousel {
+    padding: 0;
+    margin: 0;
+    gap: 0; /* No gap between photos on mobile */
     width: 100%;
+    position: relative;
+  }
+  
+  .rotating-photo {
+    width: 100%; /* Use container width */
+    min-width: 100%;
+    max-width: 100%;
+    height: 100%;
+    aspect-ratio: auto; /* Remove aspect ratio constraint on mobile */
+    object-fit: cover; /* Fill the screen completely */
+    flex-shrink: 0;
+    display: block;
   }
 }
 
@@ -926,6 +970,7 @@
 .about-us-title {
   font-size: 48px;
   font-weight: bold;
+  font-style: italic;
   color: #ffffff;
   margin-bottom: 30px;
   text-align: center;
@@ -1273,17 +1318,33 @@
   .rotating-photos-container {
     height: 70vh;
     min-height: 500px;
+    overflow: hidden; /* Hide side photos */
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+    margin: 0;
+    padding: 0;
   }
   
   .rotating-photos-carousel {
     padding: 0;
+    margin: 0;
     width: 100%;
+    gap: 0; /* No gap between photos on mobile */
+    position: relative;
   }
   
   .rotating-photo {
-    width: 100%;
+    width: 100%; /* Use container width */
+    min-width: 100%;
+    max-width: 100%;
     height: 100%;
     min-height: 100%;
+    aspect-ratio: auto; /* Remove aspect ratio constraint on mobile */
+    object-fit: cover; /* Fill the screen completely */
+    flex-shrink: 0;
+    display: block;
   }
   
   .photo-navigation-dots {
@@ -1476,17 +1537,33 @@
   .rotating-photos-container {
     height: 70vh;
     min-height: 450px;
+    overflow: hidden; /* Hide side photos */
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+    margin: 0;
+    padding: 0;
   }
   
   .rotating-photos-carousel {
     padding: 0;
+    margin: 0;
     width: 100%;
+    gap: 0; /* No gap between photos on mobile */
+    position: relative;
   }
   
   .rotating-photo {
-    width: 100%;
+    width: 100%; /* Use container width */
+    min-width: 100%;
+    max-width: 100%;
     height: 100%;
     min-height: 100%;
+    aspect-ratio: auto; /* Remove aspect ratio constraint on mobile */
+    object-fit: cover; /* Fill the screen completely */
+    flex-shrink: 0;
+    display: block;
   }
   
   .main-logo {
@@ -1624,17 +1701,33 @@
   .rotating-photos-container {
     height: 70vh;
     min-height: 450px;
+    overflow: hidden; /* Hide side photos */
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+    margin: 0;
+    padding: 0;
   }
   
   .rotating-photos-carousel {
     padding: 0;
+    margin: 0;
     width: 100%;
+    gap: 0; /* No gap between photos on mobile */
+    position: relative;
   }
   
   .rotating-photo {
-    width: 100%;
+    width: 100%; /* Use container width */
+    min-width: 100%;
+    max-width: 100%;
     height: 100%;
     min-height: 100%;
+    aspect-ratio: auto; /* Remove aspect ratio constraint on mobile */
+    object-fit: cover; /* Fill the screen completely */
+    flex-shrink: 0;
+    display: block;
   }
   
   .main-logo {
@@ -1762,17 +1855,33 @@
   .rotating-photos-container {
     height: 70vh;
     min-height: 450px;
+    overflow: hidden; /* Hide side photos */
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+    margin: 0;
+    padding: 0;
   }
   
   .rotating-photos-carousel {
     padding: 0;
+    margin: 0;
     width: 100%;
+    gap: 0; /* No gap between photos on mobile */
+    position: relative;
   }
   
   .rotating-photo {
-    width: 100%;
+    width: 100%; /* Use container width */
+    min-width: 100%;
+    max-width: 100%;
     height: 100%;
     min-height: 100%;
+    aspect-ratio: auto; /* Remove aspect ratio constraint on mobile */
+    object-fit: cover; /* Fill the screen completely */
+    flex-shrink: 0;
+    display: block;
   }
   
   .main-logo {

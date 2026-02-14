@@ -113,7 +113,7 @@ const InfluencersPage = () => {
       <header className="page-header">
         <h1 className="page-title">Influencer Spotlight Shop</h1>
         <p className="page-subtitle">
-          Cop the curated fits from the creators redefining hoops culture. Each drop is crafted in limited runs and ships with exclusive creator content.
+          Cop the curated fits from the creators pushing hoops culture. Each drop is limited, intentional, and paired with exclusive creator content.
         </p>
       </header>
 
@@ -228,10 +228,10 @@ const InfluencersPage = () => {
       <section className="collab-section">
         <h3 className="collab-title">Creators - let's build together</h3>
         <p className="collab-copy">
-          Pitch your concept, launch drop-ready merch, and tap into the JerseyLab production network.
+          Pitch your concept, launch drop-ready merch, and collabe with us.
         </p>
-        <a className="collab-link" href="mailto:info@jerseylab.com">
-          info@jerseylab.com
+        <a className="collab-link" href="mailto:info@jerzeylab.com">
+          info@jerzeylab.com
         </a>
       </section>
 

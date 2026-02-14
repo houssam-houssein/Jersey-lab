@@ -10,6 +10,7 @@ const ShippingReturnsPage = () => {
         <section className="policy-item">
           <h2 className="policy-item-title">Processing Time</h2>
           <p className="policy-item-value">3–5 business days</p>
+          <p className="policy-item-note">For team orders, please account for additional processing/design review and approval time.</p>
         </section>
 
         <section className="policy-item">
@@ -20,18 +21,18 @@ const ShippingReturnsPage = () => {
         <section className="policy-item">
           <h2 className="policy-item-title">Returns</h2>
           <p className="policy-item-value">All sales are final.</p>
-          <p className="policy-item-note">Only accepted if there's a manufacturing defect or wrong item.</p>
+          <p className="policy-item-note">Only accepted if there's a manufacturing defect.</p>
         </section>
 
         <section className="policy-item">
           <h2 className="policy-item-title">Cancellations</h2>
-          <p className="policy-item-value">Within 24 hours of purchase only.</p>
+          <p className="policy-item-value">Within 2 business days of purchase only.</p>
         </section>
 
         <section className="policy-item">
           <h2 className="policy-item-title">Contact</h2>
           <p className="policy-item-value">
-            <a href="mailto:info@jerseylab.com" className="contact-link">info@jerseylab.com</a>
+            <a href="mailto:info@jerzeylab.com" className="contact-link">info@jerzeylab.com</a>
           </p>
         </section>
       </div>

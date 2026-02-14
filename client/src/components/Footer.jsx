@@ -29,15 +29,15 @@ const Footer = () => {
           <div className="footer-section">
             <h3 className="footer-title">CONTACT</h3>
             <ul className="footer-links">
-              <li><a href="mailto:info@jerseylab.com">info@jerseylab.com</a></li>
-              <li><a href="mailto:sales@jerseylab.com">sales@jerseylab.com</a></li>
+              <li><a href="mailto:info@jerzeylab.com">info@jerzeylab.com</a></li>
+              <li><a href="mailto:sales@jerzeylab.com">sales@jerzeylab.com</a></li>
             </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
           <p className="footer-copyright">
-            © {new Date().getFullYear()} JerseyLab. All rights reserved.
+            © {new Date().getFullYear()} JerzeyLab. All rights reserved.
           </p>
         </div>
       </div>

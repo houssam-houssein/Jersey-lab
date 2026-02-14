@@ -458,18 +458,28 @@ app.put('/api/categories/:id', async (req, res) => {
 // Teamwear Inquiry endpoints
 app.post('/api/teamwear-inquiries', async (req, res) => {
   try {
-    const { firstName, lastName, phoneNumber, email, description, designFile, fileName } = req.body
+    const { firstName, lastName, phoneNumber, email, description, designFiles, designFile, fileName } = req.body
     
-    const inquiry = await TeamwearInquiry.create({
+    // Support both new format (designFiles array) and legacy format (single designFile)
+    let inquiryData = {
       firstName,
       lastName,
       phoneNumber,
       email,
       description,
-      designFile: designFile || '',
-      fileName: fileName || '',
       status: 'pending'
-    })
+    }
+    
+    if (designFiles && Array.isArray(designFiles) && designFiles.length > 0) {
+      // New format: multiple files
+      inquiryData.designFiles = designFiles.slice(0, 5) // Limit to 5 files
+    } else if (designFile) {
+      // Legacy format: single file (for backward compatibility)
+      inquiryData.designFile = designFile
+      inquiryData.fileName = fileName || ''
+    }
+    
+    const inquiry = await TeamwearInquiry.create(inquiryData)
     
     // Send email notification to all admins
     try {

@@ -87,7 +87,7 @@ const Navbar = () => {
               TEAMWEAR
             </Link>
             <a href="#about-us" className="nav-link" onClick={handleAboutUsClick}>
-              ABOUT
+              Why us
             </a>
             <Link to="/shipping-returns" className="nav-link">
               SHIPPING & RETURNS

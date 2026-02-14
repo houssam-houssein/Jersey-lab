@@ -114,7 +114,7 @@ const ProfessionalAthletesPage = () => {
       <header className="page-header">
         <h1 className="page-title">Professional Athletes Collection</h1>
         <p className="page-subtitle">
-          Shop the latest drops from your favorite overseas pros and elite hoopers. Every jersey is verified, game-ready, and ships with a certificate of authenticity.
+          Shop the latest drops from your favorite overseas pros and elite hoopers. Every jersey is verified, game-ready, and guarenteed legit.
         </p>
       </header>
 
@@ -231,8 +231,8 @@ const ProfessionalAthletesPage = () => {
         <p className="support-copy">
           Partner with us to create exclusive jerseys, limited editions, or custom collections. Let's bring your vision to life and celebrate your legacy together.
         </p>
-        <a className="support-link" href="mailto:info@jerseylab.com">
-          info@jerseylab.com
+        <a className="support-link" href="mailto:info@jerzeylab.com">
+          info@jerzeylab.com
         </a>
       </section>
 

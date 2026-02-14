@@ -12,29 +12,54 @@ services:
         value: production
       - key: PORT
         value: 10000
+      # Database
       - key: MONGODB_URI
-        sync: false  # Set this in Render dashboard
+        sync: false  # Set this in Render dashboard (MongoDB Atlas connection string)
+      # Session & Security
       - key: SESSION_SECRET
         generateValue: true
+      # Google OAuth (optional)
       - key: GOOGLE_CLIENT_ID
-        sync: false  # Set this in Render dashboard
+        sync: false  # Set this in Render dashboard if using Google OAuth
       - key: GOOGLE_CLIENT_SECRET
-        sync: false  # Set this in Render dashboard
+        sync: false  # Set this in Render dashboard if using Google OAuth
+      - key: GOOGLE_CALLBACK_URL
+        sync: false  # Set to: https://jerzey-lab-api.onrender.com/api/auth/google/callback
+      # Frontend URL
       - key: CLIENT_URL
-        sync: false  # Set this to your frontend URL
-      - key: EMAIL_HOST
-        sync: false  # Set this in Render dashboard if using email
-      - key: EMAIL_PORT
-        sync: false  # Set this in Render dashboard if using email
+        sync: false  # Set this to your frontend URL (e.g., https://yourusername.github.io/Jersey-lab)
+      - key: CLIENT_URLS
+        sync: false  # Optional: comma-separated list of allowed frontend URLs
+      # Email Configuration
+      - key: EMAIL_SERVICE
+        sync: false  # Set to 'gmail' or leave empty for SMTP
+      - key: SMTP_HOST
+        sync: false  # SMTP server hostname (if not using Gmail)
+      - key: SMTP_PORT
+        sync: false  # SMTP port (usually 587)
+      - key: SMTP_SECURE
+        sync: false  # Set to 'true' for port 465, 'false' for other ports
       - key: EMAIL_USER
-        sync: false  # Set this in Render dashboard if using email
-      - key: EMAIL_PASS
-        sync: false  # Set this in Render dashboard if using email
+        sync: false  # Your email address (e.g., info@jerzeyLab.com)
+      - key: EMAIL_PASSWORD
+        sync: false  # Your email password or app password
+      - key: EMAIL_FROM
+        sync: false  # Email sender name/address (e.g., "JerseyLab <info@jerzeyLab.com>")
+      # Stripe Payment Integration
+      - key: STRIPE_SECRET_KEY
+        sync: false  # Set this in Render dashboard (get from Stripe dashboard)
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false  # Set this in Render dashboard (get from Stripe webhook settings)
+      # Ethereal Email (for testing - optional)
+      - key: ETHEREAL_USER
+        sync: false  # Only for testing email without real SMTP
+      - key: ETHEREAL_PASS
+        sync: false  # Only for testing email without real SMTP
 
 # Note: Static sites must be created manually in Render Dashboard
 # Go to: New > Static Site
 # Configure:
-#   - Build Command: cd client && npm install && npm run build
-#   - Publish Directory: client/dist
+#   - Build Command: cd client && npm install && npm run build:github
+#   - Publish Directory: client/docs
 #   - Environment Variable: VITE_API_URL = https://jerzey-lab-api.onrender.com
 

@@ -50,7 +50,7 @@ const transporter = createTransporter()
 export const sendWelcomeEmail = async (userEmail, userName) => {
   try {
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'noreply@jerzeylab.com'}>`,
+      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'info@jerzeyLab.com'}>`,
       to: userEmail,
       subject: 'Welcome to JerseyLab! 🏀',
       html: `
@@ -111,12 +111,12 @@ export const sendWelcomeEmail = async (userEmail, userName) => {
         <body>
           <div class="container">
             <div class="header">
-              <div class="logo">JerseyLab</div>
+              <div class="logo">JerzeyLab</div>
             </div>
             <div class="content">
-              <h2>Welcome to JerseyLab, ${userName}! 🏀</h2>
+              <h2>Welcome to JerzeyLab, ${userName}! 🏀</h2>
               <p>Thank you for joining our community of athletes, influencers, and basketball enthusiasts.</p>
-              <p>We're excited to have you on board! At JerseyLab, we create premium athletic wear that represents the culture and passion of the game.</p>
+              <p>We're excited to have you on board! At JerzeyLab, we create premium athletic wear that represents the culture and passion of the game.</p>
               <p>Here's what you can do next:</p>
               <ul>
                 <li>Browse our exclusive collections</li>
@@ -131,23 +131,23 @@ export const sendWelcomeEmail = async (userEmail, userName) => {
               <p>Welcome to the family!</p>
               <p style="margin-top: 30px;">
                 Best regards,<br>
-                <strong>The JerseyLab Team</strong>
+                <strong>The JerzeyLab Team</strong>
               </p>
             </div>
             <div class="footer">
-              <p>© ${new Date().getFullYear()} JerseyLab. All rights reserved.</p>
-              <p>You're receiving this email because you signed up for a JerseyLab account.</p>
+              <p>© ${new Date().getFullYear()} JerzeyLab. All rights reserved.</p>
+              <p>You're receiving this email because you signed up for a JerzeyLab account.</p>
             </div>
           </div>
         </body>
         </html>
       `,
       text: `
-        Welcome to JerseyLab, ${userName}!
+        Welcome to JerzeyLab, ${userName}!
         
         Thank you for joining our community of athletes, influencers, and basketball enthusiasts.
         
-        We're excited to have you on board! At JerseyLab, we create premium athletic wear that represents the culture and passion of the game.
+        We're excited to have you on board! At JerzeyLab, we create premium athletic wear that represents the culture and passion of the game.
         
         Start shopping: ${process.env.CLIENT_URL || 'http://localhost:5173'}
         
@@ -156,9 +156,9 @@ export const sendWelcomeEmail = async (userEmail, userName) => {
         Welcome to the family!
         
         Best regards,
-        The JerseyLab Team
+        The JerzeyLab Team
         
-        © ${new Date().getFullYear()} JerseyLab. All rights reserved.
+        © ${new Date().getFullYear()} JerzeyLab. All rights reserved.
       `
     }
 
@@ -176,7 +176,7 @@ export const sendWelcomeEmail = async (userEmail, userName) => {
 export const sendTeamwearInquiryNotification = async (ownerEmail, inquiry) => {
   try {
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'noreply@jerzeylab.com'}>`,
+      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'info@jerzeyLab.com'}>`,
       to: ownerEmail,
       subject: `New Teamwear Inquiry from ${inquiry.firstName} ${inquiry.lastName}`,
       html: `
@@ -275,7 +275,21 @@ export const sendTeamwearInquiryNotification = async (ownerEmail, inquiry) => {
                   <span class="detail-label">Submitted:</span>
                   <span class="detail-value">${new Date(inquiry.createdAt || new Date()).toLocaleString()}</span>
                 </div>
-                ${inquiry.fileName ? `
+                ${inquiry.designFiles && inquiry.designFiles.length > 0 ? `
+                <div class="detail-row" style="margin-top: 15px;">
+                  <span class="detail-label">Reference Photos (${inquiry.designFiles.length}):</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+                  ${inquiry.designFiles.map((file, index) => `
+                    <div style="border: 1px solid #e0e0e0; border-radius: 4px; overflow: hidden;">
+                      <img src="${file.file}" alt="Photo ${index + 1}" style="width: 100%; height: 150px; object-fit: cover; display: block;" />
+                      <div style="padding: 8px; background-color: #f9f9f9;">
+                        <p style="margin: 0; font-size: 11px; color: #666; word-break: break-word;">${file.fileName}</p>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                ` : inquiry.fileName ? `
                 <div class="detail-row">
                   <span class="detail-label">Design File:</span>
                   <span class="detail-value">${inquiry.fileName}</span>
@@ -314,7 +328,9 @@ export const sendTeamwearInquiryNotification = async (ownerEmail, inquiry) => {
         Email: ${inquiry.email}
         Phone: ${inquiry.phoneNumber}
         Submitted: ${new Date(inquiry.createdAt || new Date()).toLocaleString()}
-        ${inquiry.fileName ? `Design File: ${inquiry.fileName}` : ''}
+        ${inquiry.designFiles && inquiry.designFiles.length > 0 
+          ? `Reference Photos (${inquiry.designFiles.length}): ${inquiry.designFiles.map(f => f.fileName).join(', ')}`
+          : inquiry.fileName ? `Design File: ${inquiry.fileName}` : ''}
         
         Description:
         ${inquiry.description}
@@ -360,7 +376,7 @@ export const sendOrderNotificationToAdmins = async (adminEmails, order) => {
     `).join('')
 
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'noreply@jerzeylab.com'}>`,
+      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'info@jerzeyLab.com'}>`,
       to: adminEmails.join(', '),
       subject: `🛒 New Order Confirmed - ${order.orderNumber}`,
       html: `
@@ -614,7 +630,7 @@ export const sendAdminPasswordResetEmail = async (adminEmail, resetToken) => {
     const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/admin-reset-password?token=${resetToken}`
     
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'noreply@jerzeylab.com'}>`,
+      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'info@jerzeyLab.com'}>`,
       to: adminEmail,
       subject: 'Admin Password Reset Request - JerseyLab',
       html: `

@@ -111,7 +111,7 @@ const HighSchoolAthletesPage = () => {
       </Link>
 
       <header className="page-header">
-        <h1 className="page-title">High School Spotlight Shop</h1>
+        <h1 className="page-title">High School Standout Store</h1>
         <p className="page-subtitle">
           Support the future of the game. Rep limited merch from the country's rising stars, produced in partnership with their programs.
         </p>
@@ -226,12 +226,12 @@ const HighSchoolAthletesPage = () => {
       )}
 
       <section className="programs-section">
-        <h3 className="programs-title">High school athletes - let's feature your program</h3>
+        <h3 className="programs-title">High school athletes - let's feature your brand</h3>
         <p className="programs-copy">
-          Launch team stores, fundraise with specialty merch, and unlock pro-grade production with JerseyLab.
+          Launch your brand, promote specialty merch, and connect with your fans.
         </p>
-        <a className="programs-link" href="mailto:info@jerseylab.com">
-          info@jerseylab.com
+        <a className="programs-link" href="mailto:info@jerzeylab.com">
+          info@jerzeylab.com
         </a>
       </section>
 
