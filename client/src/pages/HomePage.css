@@ -80,7 +80,7 @@
   z-index: 1;
 }
 
-/* Logo Poster - Centered and fully visible */
+/* Logo Poster - Centered in poster (1cm left), shifted down */
 .main-poster-logo {
   width: 100%;
   height: auto;
@@ -92,7 +92,7 @@
   position: relative;
   z-index: 2;
   margin: auto;
-  margin-top: 5vh;
+  transform: translate(-1cm, 5vh);
 }
 
 
@@ -1387,7 +1387,7 @@
     width: 120%;
     position: relative;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(calc(-50% - 0.5cm), 0);
     margin: 0 auto;
   }
   
@@ -1590,7 +1590,7 @@
     width: 130%;
     position: relative;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(calc(-50% - 0.5cm), 0);
     margin: 0 auto;
   }
   
@@ -1754,7 +1754,7 @@
     width: 140%;
     position: relative;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(calc(-50% - 0.5cm), 0);
     margin: 0 auto;
   }
   
@@ -1908,7 +1908,7 @@
     width: 130%;
     position: relative;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(calc(-50% - 0.5cm), 0);
     margin: 0 auto;
   }
   

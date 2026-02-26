@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
-import logo from '../assets/images/logo.png'
+import logo from '../assets/images/poster.png'
 import './Navbar.css'
 
 const Navbar = () => {

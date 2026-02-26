@@ -18,19 +18,21 @@
   width: 100%;
   margin: 0 auto;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
-  padding: 15px 40px;
+  padding: 0 40px;
+  min-height: 88px;
   gap: 40px;
   overflow-x: hidden;
   overflow-y: hidden;
   box-sizing: border-box;
 }
 
-/* Logo Section */
+/* Logo Section - poster fills navbar height */
 .navbar-logo {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  height: 88px;
 }
 
 .navbar-logo a {
@@ -38,10 +40,11 @@
   align-items: center;
   text-decoration: none;
   color: white;
+  height: 100%;
 }
 
 .logo-img {
-  height: 60px;
+  height: 100%;
   width: auto;
   object-fit: contain;
 }
@@ -567,9 +570,18 @@
 /* Medium Screens / Tablets */
 @media (max-width: 968px) {
   .navbar-container {
-    padding: 15px 25px;
+    padding: 0 25px;
     gap: 20px;
     overflow-x: visible;
+    min-height: 56px;
+  }
+  
+  .navbar-logo {
+    height: 56px;
+  }
+  
+  .navbar-logo a {
+    height: 100%;
   }
   
   .navbar-right-group {
@@ -598,7 +610,7 @@
   }
   
   .logo-img {
-    height: 50px;
+    height: 100%;
   }
   
   .cart-link {
@@ -658,18 +670,24 @@
 /* Small Screens / Mobile Landscape */
 @media (max-width: 768px) {
   .navbar-container {
-    padding: 12px 20px;
+    padding: 0 20px;
     gap: 15px;
     overflow-x: visible;
+    min-height: 48px;
   }
   
   .navbar-logo {
     flex: 0 0 auto;
     z-index: 1001;
+    height: 48px;
+  }
+  
+  .navbar-logo a {
+    height: 100%;
   }
   
   .logo-img {
-    height: 45px;
+    height: 100%;
   }
   
   .navbar-right-group {
@@ -768,13 +786,22 @@
 /* Extra Small Screens / Mobile Portrait */
 @media (max-width: 480px) {
   .navbar-container {
-    padding: 10px 15px;
+    padding: 0 15px;
     gap: 10px;
     overflow-x: visible;
+    min-height: 44px;
+  }
+  
+  .navbar-logo {
+    height: 44px;
+  }
+  
+  .navbar-logo a {
+    height: 100%;
   }
   
   .logo-img {
-    height: 40px;
+    height: 100%;
   }
   
   .navbar-right-group {
@@ -884,13 +911,22 @@
 /* Very Small Screens */
 @media (max-width: 360px) {
   .navbar-container {
-    padding: 8px 12px;
+    padding: 0 12px;
     gap: 8px;
     overflow-x: visible;
+    min-height: 40px;
+  }
+  
+  .navbar-logo {
+    height: 40px;
+  }
+  
+  .navbar-logo a {
+    height: 100%;
   }
   
   .logo-img {
-    height: 35px;
+    height: 100%;
   }
   
   .navbar-right-group {
@@ -936,11 +972,20 @@
 /* Height-based adjustments for landscape mobile */
 @media (max-height: 500px) and (orientation: landscape) {
   .navbar-container {
-    padding: 10px 20px;
+    padding: 0 20px;
+    min-height: 40px;
+  }
+  
+  .navbar-logo {
+    height: 40px;
+  }
+  
+  .navbar-logo a {
+    height: 100%;
   }
   
   .logo-img {
-    height: 40px;
+    height: 100%;
   }
 }
 
