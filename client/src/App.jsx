@@ -1,5 +1,4 @@
-import { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -88,25 +87,8 @@ function getBasename() {
   }
 }
 
-// Handle GitHub Pages 404 redirect: URL like /Jersey-lab/?/admin -> navigate to /admin
-function useQueryStringPathSync() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  useEffect(() => {
-    const search = window.location.search
-    if (search && search.startsWith('?/')) {
-      const pathFromQuery = search.slice(2).replace(/~and~/g, '&').split('&')[0]
-      if (pathFromQuery) {
-        const path = pathFromQuery.startsWith('/') ? pathFromQuery : `/${pathFromQuery}`
-        navigate(path, { replace: true })
-      }
-    }
-  }, []) // Run once on mount
-}
-
 const AppContent = () => {
   const location = useLocation()
-  useQueryStringPathSync()
   const hideNavbar = location.pathname.startsWith('/admin') || location.pathname.startsWith('/admin-login')
 
   return (
@@ -132,14 +114,39 @@ const AppContent = () => {
   )
 }
 
+// Use HashRouter on GitHub Pages (or any project subpath) so #/admin and #/admin-login work.
+// BrowserRouter only on localhost / root so pathname routing works in dev.
+function getRouter() {
+  if (typeof window === 'undefined') {
+    return <AppContent />
+  }
+  const hostname = window.location.hostname
+  const pathname = window.location.pathname || '/'
+  const isGitHubPages = hostname.includes('github.io')
+  const isProjectSubpath = pathname.startsWith('/Jersey-lab') || pathname.startsWith('/jersey-lab')
+  const useHashRouter = isGitHubPages || isProjectSubpath
+  const basename = getBasename()
+
+  if (useHashRouter) {
+    return (
+      <HashRouter>
+        <AppContent />
+      </HashRouter>
+    )
+  }
+  return (
+    <BrowserRouter basename={basename}>
+      <AppContent />
+    </BrowserRouter>
+  )
+}
+
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
         <CartProvider>
-          <Router basename={getBasename()}>
-            <AppContent />
-          </Router>
+          {getRouter()}
         </CartProvider>
       </AuthProvider>
     </ErrorBoundary>
