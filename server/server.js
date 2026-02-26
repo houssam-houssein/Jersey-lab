@@ -117,10 +117,20 @@ app.use(passport.session())
 const hasGoogleKeys = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
 
 if (hasGoogleKeys) {
+  // Ensure callback URL is valid (fix if env value was set as "GOOGLE_CALLBACK_URL=https://...")
+  let callbackURL = (process.env.GOOGLE_CALLBACK_URL || '').trim()
+  if (callbackURL.includes('GOOGLE_CALLBACK_URL=')) {
+    callbackURL = (callbackURL.split('GOOGLE_CALLBACK_URL=')[1] || '').split(/\s/)[0].trim()
+  }
+  if (!callbackURL || (!callbackURL.startsWith('http://') && !callbackURL.startsWith('https://'))) {
+    callbackURL = process.env.NODE_ENV === 'production'
+      ? 'https://jerzey-lab-api.onrender.com/api/auth/google/callback'
+      : 'http://localhost:5000/api/auth/google/callback'
+  }
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL || '/api/auth/google/callback',
+    callbackURL,
     passReqToCallback: true // Allow access to request object
   }, async (req, accessToken, refreshToken, profile, done) => {
     try {
