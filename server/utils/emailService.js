@@ -18,6 +18,20 @@ const createTransporter = () => {
       }
     })
   }
+
+  // GoDaddy Workspace Email / domain email (SMTP)
+  // Use with EMAIL_SERVICE=godaddy, EMAIL_USER=your@domain.com, EMAIL_PASSWORD=your password
+  if (process.env.EMAIL_SERVICE === 'godaddy' || process.env.SMTP_HOST === 'smtpout.secureserver.net') {
+    return nodemailer.createTransport({
+      host: 'smtpout.secureserver.net',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    })
+  }
   
   // Generic SMTP configuration
   if (process.env.SMTP_HOST) {
@@ -46,9 +60,24 @@ const createTransporter = () => {
 
 const transporter = createTransporter()
 
+// Log which email transport is active (help debug "no email received")
+function logEmailTransport () {
+  if (process.env.EMAIL_SERVICE === 'godaddy' || process.env.SMTP_HOST === 'smtpout.secureserver.net') {
+    console.log('📧 Email: using GoDaddy SMTP (smtpout.secureserver.net)')
+  } else if (process.env.EMAIL_SERVICE === 'gmail') {
+    console.log('📧 Email: using Gmail')
+  } else if (process.env.SMTP_HOST) {
+    console.log('📧 Email: using SMTP', process.env.SMTP_HOST)
+  } else {
+    console.warn('📧 Email: using Ethereal (test only – emails are NOT delivered to real inboxes). Set EMAIL_SERVICE=godaddy and EMAIL_USER/EMAIL_PASSWORD in .env for real delivery.')
+  }
+}
+logEmailTransport()
+
 // Welcome email template
 export const sendWelcomeEmail = async (userEmail, userName) => {
   try {
+    console.log('📧 Sending welcome email to:', userEmail)
     const mailOptions = {
       from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'info@jerzeyLab.com'}>`,
       to: userEmail,
@@ -163,11 +192,59 @@ export const sendWelcomeEmail = async (userEmail, userName) => {
     }
 
     const info = await transporter.sendMail(mailOptions)
-    console.log('Welcome email sent:', info.messageId)
+    console.log('📧 Welcome email sent to', userEmail, '| messageId:', info.messageId)
     return { success: true, messageId: info.messageId }
   } catch (error) {
-    console.error('Error sending welcome email:', error)
+    console.error('📧 Welcome email FAILED to', userEmail, '|', error.message)
+    if (error.response) console.error('   Response:', error.response)
+    if (error.code) console.error('   Code:', error.code)
     // Don't throw error - email failure shouldn't break signup
+    return { success: false, error: error.message }
+  }
+}
+
+// Notify owner that a new user has signed up (to: owner email)
+export const sendNewUserSignupNotificationToOwner = async (userEmail, userName) => {
+  const ownerEmail = process.env.OWNER_EMAIL || 'a3b0ac16-95f5-9639-1809-40327931842f@jerzeylab.com'
+  if (!ownerEmail) return { success: false, error: 'No owner email configured' }
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || `"JerseyLab" <${process.env.EMAIL_USER || 'info@jerzeyLab.com'}>`,
+      to: ownerEmail,
+      subject: 'JerseyLab: New user signup',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 560px; margin: 0 auto; padding: 20px; background: #f4f4f4; }
+            .container { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .header { font-size: 18px; font-weight: bold; margin-bottom: 16px; color: #000; }
+            .detail { margin: 8px 0; }
+            .label { font-weight: 600; color: #555; }
+            .footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee; font-size: 12px; color: #999; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">New user signup</div>
+            <p>A new user has signed up on JerseyLab.</p>
+            <div class="detail"><span class="label">Name:</span> ${userName || '—'}</div>
+            <div class="detail"><span class="label">Email:</span> <a href="mailto:${userEmail}">${userEmail}</a></div>
+            <div class="footer">JerseyLab admin notification. ${new Date().toISOString()}</div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `New user signup\n\nName: ${userName || '—'}\nEmail: ${userEmail}\n\nJerseyLab admin notification. ${new Date().toISOString()}`
+    }
+    const info = await transporter.sendMail(mailOptions)
+    console.log('New user signup notification sent to owner:', info.messageId)
+    return { success: true, messageId: info.messageId }
+  } catch (error) {
+    console.error('Error sending new user signup notification to owner:', error)
     return { success: false, error: error.message }
   }
 }
