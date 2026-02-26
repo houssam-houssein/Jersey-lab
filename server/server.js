@@ -13,6 +13,7 @@ import PromoCode from './models/PromoCode.js'
 import Order from './models/Order.js'
 import { 
   sendWelcomeEmail, 
+  sendNewUserSignupNotificationToOwner,
   sendTeamwearInquiryNotification, 
   sendOrderNotificationToAdmins,
   sendAdminPasswordResetEmail,
@@ -156,9 +157,12 @@ if (hasGoogleKeys) {
           user.loginCount = 1
           await user.save()
           
-          // Send welcome email for new signup via Google
+          // Send welcome email to new user and notify owner
           sendWelcomeEmail(user.email, user.name).catch(err => 
             console.error('Failed to send welcome email:', err)
+          )
+          sendNewUserSignupNotificationToOwner(user.email, user.name).catch(err => 
+            console.error('Failed to send new user notification to owner:', err)
           )
         } else {
           // User exists and has signed up - regular login
@@ -184,9 +188,12 @@ if (hasGoogleKeys) {
           loginCount: 1
         })
         
-        // Send welcome email for new signup via Google
+        // Send welcome email to new user and notify owner
         sendWelcomeEmail(user.email, user.name).catch(err => 
           console.error('Failed to send welcome email:', err)
+        )
+        sendNewUserSignupNotificationToOwner(user.email, user.name).catch(err => 
+          console.error('Failed to send new user notification to owner:', err)
         )
       }
 
@@ -241,6 +248,15 @@ passport.deserializeUser(async (id, done) => {
 })
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({
+    name: 'JerseyLab API',
+    status: 'running',
+    health: '/api/health',
+    docs: 'Use the API endpoints under /api/'
+  })
+})
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' })
 })
@@ -556,9 +572,12 @@ app.post('/api/auth/signup', async (req, res) => {
         existingUser.provider = password ? 'local' : 'google'
         await existingUser.save()
         
-        // Send welcome email (don't wait for it to complete)
+        // Send welcome email to user and notify owner
         sendWelcomeEmail(existingUser.email, existingUser.name).catch(err => 
           console.error('Failed to send welcome email:', err)
+        )
+        sendNewUserSignupNotificationToOwner(existingUser.email, existingUser.name).catch(err => 
+          console.error('Failed to send new user notification to owner:', err)
         )
         
         return res.json({ 
@@ -588,9 +607,12 @@ app.post('/api/auth/signup', async (req, res) => {
 
     const user = await User.create(userData)
 
-    // Send welcome email (don't wait for it to complete - non-blocking)
+    // Send welcome email to user and notify owner
     sendWelcomeEmail(user.email, user.name).catch(err => 
       console.error('Failed to send welcome email:', err)
+    )
+    sendNewUserSignupNotificationToOwner(user.email, user.name).catch(err => 
+      console.error('Failed to send new user notification to owner:', err)
     )
 
     res.json({ 
