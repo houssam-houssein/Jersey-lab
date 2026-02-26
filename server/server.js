@@ -43,8 +43,14 @@ const defaultOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000'
 ]
+// When frontend is on GitHub Pages, browser sends Origin without path (e.g. https://houssam-houssein.github.io)
+const githubPagesOrigin = process.env.NODE_ENV === 'production' ? 'https://houssam-houssein.github.io' : null
 const envOrigins = process.env.CLIENT_URLS || process.env.CLIENT_URL || ''
-const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins.split(',').map(origin => origin.trim()).filter(Boolean)])]
+const allowedOrigins = [...new Set([
+  ...defaultOrigins,
+  ...(githubPagesOrigin ? [githubPagesOrigin] : []),
+  ...envOrigins.split(',').map(origin => origin.trim()).filter(Boolean)
+])]
 
 // CORS configuration - allow credentials and multiple origins
 app.use(cors({
@@ -63,14 +69,17 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
 // Session configuration
+// In production with frontend on different domain (e.g. GitHub Pages), cookie must be sameSite: 'none' so it's sent cross-origin
+const isProduction = process.env.NODE_ENV === 'production'
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProduction,
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: isProduction ? 'none' : 'lax' // 'none' required for cross-origin (e.g. GitHub Pages → Render)
   }
 }))
 
@@ -726,6 +735,11 @@ if (hasGoogleKeys) {
 
   app.get('/api/auth/google/callback',
     (req, res, next) => {
+      // Callback URL must only be hit by Google with ?code=... Do not open this URL directly.
+      if (!req.query || !req.query.code) {
+        const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/$/, '')
+        return res.redirect(`${clientUrl}/login?error=invalid_callback`)
+      }
       const isSignupFlow = req.session?.isSignupFlow || false
       passport.authenticate('google', (err, user, info) => {
         if (err) {
