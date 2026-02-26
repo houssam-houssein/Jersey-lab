@@ -28,6 +28,9 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5000
 
+// Required when behind a proxy (e.g. Render) so secure cookies and redirects work
+app.set('trust proxy', 1)
+
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder_key_replace_with_real_key', {
   apiVersion: '2024-12-18.acacia'
@@ -43,6 +46,8 @@ const defaultOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000'
 ]
+// Production frontend (GitHub Pages) — used for redirects and CORS when running on Render
+const PRODUCTION_CLIENT_BASE = 'https://houssam-houssein.github.io/Jersey-lab'
 // When frontend is on GitHub Pages, browser sends Origin without path (e.g. https://houssam-houssein.github.io)
 const githubPagesOrigin = process.env.NODE_ENV === 'production' ? 'https://houssam-houssein.github.io' : null
 const envOrigins = process.env.CLIENT_URLS || process.env.CLIENT_URL || ''
@@ -157,13 +162,8 @@ if (hasGoogleKeys) {
         ]
       })
 
-      // If this is a signup flow and user already exists, prevent duplicate signup
-      if (isSignupFlow && user && user.hasSignedUp) {
-        const error = new Error('Account already exists')
-        error.code = 'ACCOUNT_EXISTS'
-        return done(error, null)
-      }
-      
+      // Login and Sign up with Google both do the same: create user if new, otherwise log in.
+      // No "account already exists" error — if they use Sign up but already have an account, just log them in.
       if (user) {
         // If user exists but hasn't signed up, complete signup
         if (!user.hasSignedUp) {
@@ -733,46 +733,37 @@ if (hasGoogleKeys) {
     }
   )
 
+  // Base URL for redirects: production = GitHub Pages (even if CLIENT_URL not set on Render), dev = localhost
+  const getClientBaseUrl = () => {
+    const url = (process.env.CLIENT_URL || (process.env.NODE_ENV === 'production' ? PRODUCTION_CLIENT_BASE : 'http://localhost:5173')).replace(/\/$/, '')
+    return url
+  }
+
   app.get('/api/auth/google/callback',
     (req, res, next) => {
-      // Callback URL must only be hit by Google with ?code=... Do not open this URL directly.
+      const base = getClientBaseUrl()
       if (!req.query || !req.query.code) {
-        const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/$/, '')
-        return res.redirect(`${clientUrl}/login?error=invalid_callback`)
+        return res.redirect(`${base}/login?error=invalid_callback`)
       }
       const isSignupFlow = req.session?.isSignupFlow || false
       passport.authenticate('google', (err, user, info) => {
         if (err) {
           console.error('OAuth error:', err.message)
-          // Clear signup flag on error
-          if (req.session) {
-            req.session.isSignupFlow = false
-          }
-          
-          // Check if error is due to account already existing
-          if (err.code === 'ACCOUNT_EXISTS') {
-            return res.redirect(process.env.CLIENT_URL + '/signup?error=account_exists')
-          }
-          
-          return res.redirect(process.env.CLIENT_URL + '/login?error=auth_failed')
+          if (req.session) req.session.isSignupFlow = false
+          return res.redirect(`${base}/login?error=auth_failed`)
         }
         if (!user) {
-          return res.redirect(process.env.CLIENT_URL + '/login?error=no_user')
+          return res.redirect(`${base}/login?error=no_user`)
         }
         req.login(user, (loginErr) => {
           if (loginErr) {
-            return res.redirect(process.env.CLIENT_URL + '/login?error=session_failed')
+            return res.redirect(`${base}/login?error=session_failed`)
           }
-          // Clear signup flag after successful login
-          if (req.session) {
-            req.session.isSignupFlow = false
-          }
-          // If this was a signup flow, redirect to signup page with success message
+          if (req.session) req.session.isSignupFlow = false
           if (isSignupFlow) {
-            return res.redirect(process.env.CLIENT_URL + '/signup?signup=success')
+            return res.redirect(`${base}/signup?signup=success`)
           }
-          // Otherwise, regular login - redirect to homepage
-          return res.redirect(process.env.CLIENT_URL + '/?login=success')
+          return res.redirect(`${base}/?login=success`)
         })
       })(req, res, next)
     }
