@@ -1,3 +1,4 @@
+﻿<<<<<<< HEAD
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
@@ -95,16 +96,16 @@ const connectionOptions = isLocalMongoDB
     }
 
 mongoose.connect(MONGODB_URI, connectionOptions).then(() => {
-  console.log(`✅ Connected to ${isLocalMongoDB ? 'Local MongoDB' : 'MongoDB Atlas'}`)
+  console.log(`âœ… Connected to ${isLocalMongoDB ? 'Local MongoDB' : 'MongoDB Atlas'}`)
   if (isLocalMongoDB) {
-    console.log('📍 Database: Jerseylab (localhost:27017)')
+    console.log('ðŸ“ Database: Jerseylab (localhost:27017)')
   }
 }).catch((error) => {
-  console.error('❌ MongoDB connection error:', error.message)
+  console.error('âŒ MongoDB connection error:', error.message)
   if (isLocalMongoDB) {
-    console.error('💡 Make sure MongoDB is running locally: mongod')
+    console.error('ðŸ’¡ Make sure MongoDB is running locally: mongod')
   } else {
-    console.error('💡 Check your MongoDB Atlas connection string and IP whitelist')
+    console.error('ðŸ’¡ Check your MongoDB Atlas connection string and IP whitelist')
   }
   process.exit(1)
 })
@@ -216,7 +217,7 @@ if (hasGoogleKeys) {
     }
   }))
 } else {
-  console.warn('⚠️  Google OAuth environment variables missing. Skipping Google strategy setup.')
+  console.warn('âš ï¸  Google OAuth environment variables missing. Skipping Google strategy setup.')
 }
 
 // Serialize user for session (store user ID)
@@ -1196,12 +1197,17 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
   res.json({ received: true })
 })
 
+// 404 handler - return JSON for unknown routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found', path: req.path, health: '/api/health' })
+})
+
 // Start server
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`)
   console.log(`Google OAuth callback URL: ${process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'}`)
   
-  // Verify email configuration on startup
-  await verifyEmailConfig()
+  // Verify email configuration on startup (don't crash if it fails)
+  verifyEmailConfig().catch(err => console.warn('Email check:', err.message))
 })
 
