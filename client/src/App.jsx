@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -87,8 +88,25 @@ function getBasename() {
   }
 }
 
+// Handle GitHub Pages 404 redirect: URL like /Jersey-lab/?/admin -> navigate to /admin
+function useQueryStringPathSync() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  useEffect(() => {
+    const search = window.location.search
+    if (search && search.startsWith('?/')) {
+      const pathFromQuery = search.slice(2).replace(/~and~/g, '&').split('&')[0]
+      if (pathFromQuery) {
+        const path = pathFromQuery.startsWith('/') ? pathFromQuery : `/${pathFromQuery}`
+        navigate(path, { replace: true })
+      }
+    }
+  }, []) // Run once on mount
+}
+
 const AppContent = () => {
   const location = useLocation()
+  useQueryStringPathSync()
   const hideNavbar = location.pathname.startsWith('/admin') || location.pathname.startsWith('/admin-login')
 
   return (
