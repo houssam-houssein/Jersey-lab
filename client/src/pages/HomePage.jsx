@@ -24,6 +24,12 @@ import p12 from '../assets/images/p12.png'
 import p13 from '../assets/images/p13.png'
 import './HomePage.css'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const prefetchCollection = (key) => {
+  if (!API_URL) return
+  fetch(`${API_URL}/api/categories/key/${key}`).catch(() => {})
+}
+
 const HomePage = () => {
   const location = useLocation()
   const { checkAuth } = useAuth()
@@ -395,6 +401,7 @@ const HomePage = () => {
               to="/professional-athletes" 
               id="professional-athletes" 
               className="pa-category-link"
+              onMouseEnter={() => prefetchCollection('professionalAthletes')}
             >
               <h2 className="pa-category-title">PROFESSIONAL ATHLETES</h2>
               <p className="pa-category-description">Browse your favorite overseas professional's international jerzey</p>
@@ -417,6 +424,7 @@ const HomePage = () => {
               to="/influencers" 
               id="influencers" 
               className="influencers-category-link"
+              onMouseEnter={() => prefetchCollection('influencers')}
             >
               <h2 className="influencers-category-title">INFLUENCERS</h2>
               <p className="influencers-category-description">Browse your favorite influencers' gear</p>
@@ -442,6 +450,7 @@ const HomePage = () => {
               to="/high-school-athletes" 
               id="high-school-athletes" 
               className="ha-category-link"
+              onMouseEnter={() => prefetchCollection('highSchoolAthletes')}
             >
               <h2 className="ha-category-title">HIGH SCHOOL ATHLETES</h2>
               <p className="ha-category-description">Browse your favorite High School star</p>

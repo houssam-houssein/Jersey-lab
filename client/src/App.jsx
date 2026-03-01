@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
@@ -87,9 +88,20 @@ function getBasename() {
   }
 }
 
+// Warm up backend (e.g. Render) on app load so collection pages load faster when user clicks
+function useApiWarmup() {
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL
+    if (apiUrl && typeof fetch === 'function') {
+      fetch(`${apiUrl}/api/health`, { method: 'GET' }).catch(() => {})
+    }
+  }, [])
+}
+
 const AppContent = () => {
   const location = useLocation()
   const hideNavbar = location.pathname.startsWith('/admin') || location.pathname.startsWith('/admin-login')
+  useApiWarmup()
 
   return (
     <div className="App">

@@ -6,6 +6,12 @@ import { useAuth } from '../context/AuthContext'
 import logo from '../assets/images/poster.png'
 import './Navbar.css'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const prefetchCollection = (key) => {
+  if (!API_URL) return
+  fetch(`${API_URL}/api/categories/key/${key}`).catch(() => {})
+}
+
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
@@ -74,13 +80,13 @@ const Navbar = () => {
         <div className="navbar-right-group">
           {/* Navigation Links - Desktop */}
           <div className="navbar-links desktop-nav-links">
-            <Link to="/professional-athletes" className="nav-link">
+            <Link to="/professional-athletes" className="nav-link" onMouseEnter={() => prefetchCollection('professionalAthletes')}>
               PROFESSIONAL ATHLETES
             </Link>
-            <Link to="/influencers" className="nav-link">
+            <Link to="/influencers" className="nav-link" onMouseEnter={() => prefetchCollection('influencers')}>
               INFLUENCERS
             </Link>
-            <Link to="/high-school-athletes" className="nav-link">
+            <Link to="/high-school-athletes" className="nav-link" onMouseEnter={() => prefetchCollection('highSchoolAthletes')}>
               HIGH SCHOOL ATHLETES
             </Link>
             <Link to="/teamwear" className="nav-link">
@@ -189,13 +195,13 @@ const Navbar = () => {
         >
           <div className="mobile-menu-content">
             <div className="mobile-nav-links">
-              <Link to="/professional-athletes" className="mobile-nav-link" onClick={handleLinkClick}>
+              <Link to="/professional-athletes" className="mobile-nav-link" onClick={handleLinkClick} onTouchStart={() => prefetchCollection('professionalAthletes')}>
                 PROFESSIONAL ATHLETES
               </Link>
-              <Link to="/influencers" className="mobile-nav-link" onClick={handleLinkClick}>
+              <Link to="/influencers" className="mobile-nav-link" onClick={handleLinkClick} onTouchStart={() => prefetchCollection('influencers')}>
                 INFLUENCERS
               </Link>
-              <Link to="/high-school-athletes" className="mobile-nav-link" onClick={handleLinkClick}>
+              <Link to="/high-school-athletes" className="mobile-nav-link" onClick={handleLinkClick} onTouchStart={() => prefetchCollection('highSchoolAthletes')}>
                 HIGH SCHOOL ATHLETES
               </Link>
               <Link to="/teamwear" className="mobile-nav-link" onClick={handleLinkClick}>

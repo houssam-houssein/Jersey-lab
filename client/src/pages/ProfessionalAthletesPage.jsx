@@ -119,10 +119,15 @@ const ProfessionalAthletesPage = () => {
       </header>
 
       {loading ? (
-        <section className="loading-section">
-          <div className="loading-spinner"></div>
-          <p>Loading products...</p>
-          <p className="loading-hint">First connection may take a moment</p>
+        <section className="athletes-grid loading-skeleton-grid" aria-label="Loading">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="skeleton-card">
+              <div className="skeleton-image" />
+              <div className="skeleton-line skeleton-title" />
+              <div className="skeleton-line skeleton-price" />
+            </div>
+          ))}
+          <p className="loading-hint-inline">Loading products… First connection may take a moment.</p>
         </section>
       ) : products.length === 0 ? (
         <section className="coming-soon-section" aria-label="Coming soon">

@@ -387,9 +387,9 @@ app.post('/api/admin/reset-password', async (req, res) => {
   }
 })
 
-// Simple in-memory cache for categories (5 minute TTL)
+// Simple in-memory cache for categories (15 min TTL — faster repeat visits)
 const categoryCache = new Map()
-const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+const CACHE_TTL = 15 * 60 * 1000 // 15 minutes
 
 const getCachedCategory = (key) => {
   const cached = categoryCache.get(key)
