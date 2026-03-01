@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import './AdminDashboardPage.css'
 import adminLogo from '../assets/images/logo.png'
 
@@ -544,6 +546,143 @@ const AdminDashboardPage = () => {
     if (section) {
       section.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
+  }
+
+  const exportReportAsPdf = () => {
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+    const pageW = doc.internal.pageSize.getWidth()
+    let y = 14
+
+    doc.setFontSize(18)
+    doc.text('JerseyLab Admin Report', 14, y)
+    y += 8
+    doc.setFontSize(10)
+    doc.setTextColor(100, 100, 100)
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, y)
+    doc.setTextColor(0, 0, 0)
+    y += 12
+
+    doc.setFontSize(11)
+    doc.text('Summary', 14, y)
+    y += 6
+    doc.setFontSize(9)
+    doc.text(`Orders: ${orders.length}  |  Users: ${users.length}  |  Teamwear inquiries: ${teamwearInquiries.length}  |  Promo codes: ${promoCodes.length}  |  Admins: ${admins.length}`, 14, y)
+    y += 10
+
+    if (orders.length > 0) {
+      doc.setFontSize(11)
+      doc.text('Orders', 14, y)
+      y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Order ID', 'Customer', 'Category', 'Items', 'Total', 'Status', 'Date']],
+        body: orders.map(o => [
+          String(o.id || o.orderNumber || ''),
+          String(o.customer || o.customerName || ''),
+          String(o.category || ''),
+          String(o.items ?? ''),
+          String(o.total || o.totalAmount || ''),
+          String(o.status || o.orderStatus || ''),
+          String(o.date || (o.createdAt ? new Date(o.createdAt).toLocaleDateString() : ''))
+        ]),
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        margin: { left: 14 }
+      })
+      y = doc.lastAutoTable.finalY + 10
+    }
+
+    if (users.length > 0) {
+      if (y > 250) { doc.addPage(); y = 14 }
+      doc.setFontSize(11)
+      doc.text('Users', 14, y)
+      y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Name', 'Email', 'Provider', 'Verified', 'Sign Up', 'Last Login']],
+        body: users.map(u => [
+          String(u.name || 'N/A'),
+          String(u.email || ''),
+          String(u.provider || 'local'),
+          u.isVerified ? 'Yes' : 'No',
+          u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A',
+          u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never'
+        ]),
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        margin: { left: 14 }
+      })
+      y = doc.lastAutoTable.finalY + 10
+    }
+
+    if (teamwearInquiries.length > 0) {
+      if (y > 250) { doc.addPage(); y = 14 }
+      doc.setFontSize(11)
+      doc.text('Teamwear Inquiries', 14, y)
+      y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Contact', 'Email', 'Team', 'Status', 'Date']],
+        body: teamwearInquiries.map(i => [
+          String(i.contactName || i.name || ''),
+          String(i.email || ''),
+          String(i.teamName || i.team || ''),
+          String(i.status || 'New'),
+          i.createdAt ? new Date(i.createdAt).toLocaleDateString() : ''
+        ]),
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        margin: { left: 14 }
+      })
+      y = doc.lastAutoTable.finalY + 10
+    }
+
+    if (promoCodes.length > 0) {
+      if (y > 250) { doc.addPage(); y = 14 }
+      doc.setFontSize(11)
+      doc.text('Promo Codes', 14, y)
+      y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Code', 'Type', 'Value', 'Active', 'Start', 'End']],
+        body: promoCodes.map(p => [
+          String(p.code || ''),
+          String(p.discountType || ''),
+          String(p.discountValue ?? ''),
+          p.isActive ? 'Yes' : 'No',
+          p.startDate ? new Date(p.startDate).toLocaleDateString() : '',
+          p.endDate ? new Date(p.endDate).toLocaleDateString() : ''
+        ]),
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        margin: { left: 14 }
+      })
+      y = doc.lastAutoTable.finalY + 10
+    }
+
+    if (admins.length > 0) {
+      if (y > 250) { doc.addPage(); y = 14 }
+      doc.setFontSize(11)
+      doc.text('Admins', 14, y)
+      y += 6
+      autoTable(doc, {
+        startY: y,
+        head: [['Name', 'Email', 'Role']],
+        body: admins.map(a => [
+          String(a.name || ''),
+          String(a.email || ''),
+          String(a.role || '')
+        ]),
+        theme: 'grid',
+        styles: { fontSize: 8 },
+        margin: { left: 14 }
+      })
+    }
+
+    const filename = `JerseyLab-Admin-Report-${new Date().toISOString().slice(0, 10)}.pdf`
+    doc.save(filename)
+    setStatusMessage({ text: 'Report exported as PDF.', type: 'success' })
+    setTimeout(() => setStatusMessage({ text: '', type: '' }), 3000)
   }
 
   const handleSaveCategory = async (categoryKey) => {
@@ -1321,7 +1460,7 @@ const AdminDashboardPage = () => {
           <img src={adminLogo} alt='JerseyLab' className='brand-logo' />
         </div>
         <div className='admin-header-actions'>
-          <button className='primary-button' onClick={() => alert('Future: generate latest performance PDF')}>
+          <button className='primary-button' onClick={exportReportAsPdf}>
             Export Report
           </button>
           <button
