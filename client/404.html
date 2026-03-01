@@ -46,13 +46,13 @@
       // Get remaining path (e.g., admin, admin-login, etc.)
       var remainingPath = pathSegments.slice(pathSegmentsToKeep).join('/');
       
-      // Only redirect if there's a remaining path
+      // Only redirect if there's a remaining path (use hash so React Router works reliably)
       if (remainingPath && remainingPath !== 'index.html') {
         var redirectUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-          basePath + '/?/' +
+          basePath + '/#/' +
           remainingPath.replace(/&/g, '~and~') +
           (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-          l.hash;
+          (l.hash && !l.hash.startsWith('#/') ? l.hash : '');
         
         l.replace(redirectUrl);
       }

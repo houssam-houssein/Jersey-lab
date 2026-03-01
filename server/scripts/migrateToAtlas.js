@@ -4,6 +4,9 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import Category from '../models/Category.js'
 import Admin from '../models/Admin.js'
+import User from '../models/User.js'
+import Order from '../models/Order.js'
+import PromoCode from '../models/PromoCode.js'
 import TeamwearInquiry from '../models/TeamwearInquiry.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -130,12 +133,18 @@ async function migrate() {
     const results = {
       categories: { migrated: 0, skipped: 0, errors: 0 },
       admins: { migrated: 0, skipped: 0, errors: 0 },
+      users: { migrated: 0, skipped: 0, errors: 0 },
+      orders: { migrated: 0, skipped: 0, errors: 0 },
+      promocodes: { migrated: 0, skipped: 0, errors: 0 },
       teamwearinquiries: { migrated: 0, skipped: 0, errors: 0 }
     }
     
     // Migrate each collection
     results.categories = await migrateCollection('categories', Category, localDb, atlasDb)
     results.admins = await migrateCollection('admins', Admin, localDb, atlasDb)
+    results.users = await migrateCollection('users', User, localDb, atlasDb)
+    results.orders = await migrateCollection('orders', Order, localDb, atlasDb)
+    results.promocodes = await migrateCollection('promocodes', PromoCode, localDb, atlasDb)
     results.teamwearinquiries = await migrateCollection('teamwearinquiries', TeamwearInquiry, localDb, atlasDb)
     
     // Print summary

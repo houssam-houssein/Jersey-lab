@@ -486,7 +486,7 @@ const HomePage = () => {
           <h2 className="about-us-title">JerzeyLab</h2>
           <div className="about-us-text">
             <p className="about-us-paragraph">
-              At JerzeyLab, jerseys are more than fabric — they're living stories of the game. Every player, from professional athletes to high school standouts and basketball creators, carries a legacy worth celebrating.
+              At JerzeyLab LLC. , jerseys are more than fabric — they're living stories of the game. Every player, from professional athletes to high school standouts and basketball creators, carries a legacy worth celebrating.
             </p>
             <p className="about-us-paragraph">
               That's why we partner directly with players to design and release authentic, story-driven jerseys. From the teams they represent to the years they've shined, every piece captures a real chapter of their basketball history.
@@ -500,7 +500,7 @@ const HomePage = () => {
               <li>Celebrate basketball culture at every level — from the biggest stages to the next wave</li>
             </ul>
             <p className="about-us-paragraph">
-              JerzeyLab isn't just a store. It's a movement — bringing players, fans, and communities together to preserve the spirit, history, and future of the game.
+              JerzeyLab LLC. isn't just a store. It's a movement — bringing players, fans, and communities together to preserve the spirit, history, and future of the game.
             </p>
           </div>
         </div>

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:github": "cross-env BUILD_TO_DOCS=true VITE_BASE_PATH=/Jersey-lab/ vite build",
+    "build:github": "cross-env BUILD_TO_DOCS=true VITE_BASE_PATH=/Jersey-lab/ VITE_API_URL=https://jerzey-lab-api.onrender.com vite build",
     "preview": "vite preview"
   },
   "dependencies": {

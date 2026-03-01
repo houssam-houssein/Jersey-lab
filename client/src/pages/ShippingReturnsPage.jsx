@@ -16,6 +16,7 @@ const ShippingReturnsPage = () => {
         <section className="policy-item">
           <h2 className="policy-item-title">Shipping Time</h2>
           <p className="policy-item-value">4–5 weeks (U.S. only)</p>
+          <p className="policy-item-note">Please review our terms & Conditions page for more information.</p>
         </section>
 
         <section className="policy-item">
